@@ -28,7 +28,9 @@ class WebSecurityConfig(private var jwtTokenProvider: JwtTokenProvider) {
         http
             .headers().frameOptions().disable()
         http.authorizeRequests()
-            .antMatchers("**").permitAll() // 임시
+            .antMatchers("/user/register").permitAll()
+            .antMatchers("/user/login").permitAll()
+            .antMatchers("/users/test").hasRole("ROLE_BUSINESS")
             .anyRequest().authenticated()
             .and()
             .addFilterBefore(
