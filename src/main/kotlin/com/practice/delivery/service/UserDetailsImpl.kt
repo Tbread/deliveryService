@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails
 
 class UserDetailsImpl(private var user: User) : UserDetails {
 
-    fun userdetailsImple(user: User) {
+    fun userdetailsImpl(user: User) {
         this.user = user
     }
 
@@ -23,7 +23,7 @@ class UserDetailsImpl(private var user: User) : UserDetails {
     }
 
     override fun getUsername(): String {
-        return user.username
+        return user.email
     }
 
     override fun isAccountNonExpired(): Boolean {

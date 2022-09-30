@@ -13,10 +13,10 @@ class UserDetailsServiceImpl(private var userRepository: userRepository) : UserD
 
 
     @Throws(UsernameNotFoundException::class)
-    override fun loadUserByUsername(username: String): UserDetails {
-        var user: User? = userRepository.findByUsername(username)
+    override fun loadUserByUsername(email: String): UserDetails {
+        var user: User? = userRepository.findByEmail(email)
         if (Objects.isNull(user)) {
-            throw UsernameNotFoundException("UsernameNotFound")
+            throw UsernameNotFoundException("EmailNotFound")
         } else {
             return UserDetailsImpl(user!!)
         }
