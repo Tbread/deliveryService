@@ -1,7 +1,7 @@
 package com.practice.delivery.service
 
 import com.practice.delivery.entity.User
-import com.practice.delivery.repository.userRepository
+import com.practice.delivery.repository.UserRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class UserDetailsServiceImpl(private var userRepository: userRepository) : UserDetailsService {
+class UserDetailsServiceImpl(private var userRepository: UserRepository) : UserDetailsService {
 
 
     @Throws(UsernameNotFoundException::class)
