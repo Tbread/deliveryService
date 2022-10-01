@@ -35,7 +35,7 @@ class UserServiceImpl(
         var res = RegisterUserResponseDto()
         if (bindingResult.hasErrors()) {
             res.code = HttpServletResponse.SC_BAD_REQUEST
-            res.msg = bindingResult.allErrors[0].toString()
+            res.msg = bindingResult.allErrors[0].defaultMessage
         } else {
             if (userRepository.existsByEmail(req.email!!) or adminUserRequestRepository.existsByEmail(req.email)) {
                 res.code = HttpServletResponse.SC_BAD_REQUEST
@@ -59,7 +59,7 @@ class UserServiceImpl(
         var res = RegisterUserResponseDto()
         if (bindingResult.hasErrors()) {
             res.code = HttpServletResponse.SC_BAD_REQUEST
-            res.msg = bindingResult.allErrors[0].toString()
+            res.msg = bindingResult.allErrors[0].defaultMessage
         } else {
             if (req.role == Role.ROLE_SUPERIOR_ADMIN) {
                 res.code = HttpServletResponse.SC_BAD_REQUEST
@@ -87,7 +87,7 @@ class UserServiceImpl(
         var res = LoginResponseDto()
         if (bindingResult.hasErrors()) {
             res.code = HttpServletResponse.SC_BAD_REQUEST
-            res.msg = bindingResult.allErrors[0].toString()
+            res.msg = bindingResult.allErrors[0].defaultMessage
         } else {
             var loadedUser = userRepository.findByEmail(req.email!!)
             if (Objects.isNull(loadedUser)) {

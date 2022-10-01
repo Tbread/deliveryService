@@ -36,11 +36,6 @@ class UserController(private var userService: UserService) {
         }
     }
 
-    @GetMapping("/test")
-    fun test():String{
-        return "success"
-    }
-
     @PostMapping("/login")
     fun login(@Valid @RequestBody req:LoginRequestDto,bindingResult: BindingResult):LoginResponseDto{
         return userService.login(req,bindingResult)
