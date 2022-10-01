@@ -120,7 +120,7 @@ class UserServiceImpl(
         }
         res.simpleRequestList = simpleRegisterAdminRequestList
         res.msg = "성공적으로 불러왔습니다."
-        res.code = HttpServletResponse.SC_BAD_REQUEST
+        res.code = HttpServletResponse.SC_OK
         return res
     }
 
