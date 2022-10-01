@@ -30,7 +30,7 @@ class WebSecurityConfig(private var jwtTokenProvider: JwtTokenProvider) {
         http.authorizeRequests()
             .antMatchers("/user/register").permitAll()
             .antMatchers("/user/login").permitAll()
-            .antMatchers("/users/test").hasRole("BUSINESS")
+            .antMatchers("/users/register-admin-request-list").hasRole("SUPERIOR_ADMIN")
             .anyRequest().authenticated()
             .and()
             .addFilterBefore(

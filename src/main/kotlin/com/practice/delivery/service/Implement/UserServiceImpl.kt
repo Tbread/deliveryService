@@ -4,10 +4,12 @@ import com.practice.delivery.dto.request.LoginRequestDto
 import com.practice.delivery.dto.request.RegisterUserRequestDto
 import com.practice.delivery.dto.response.LoginResponseDto
 import com.practice.delivery.dto.response.RegisterUserResponseDto
+import com.practice.delivery.dto.response.ViewRegisterAdminRequestListResponseDto
 import com.practice.delivery.entity.AdminUserRequest
 import com.practice.delivery.entity.Role
 import com.practice.delivery.entity.User
 import com.practice.delivery.jwt.JwtTokenProvider
+import com.practice.delivery.model.SimpleRegisterAdminRequest
 import com.practice.delivery.repository.AdminUserRequestRepository
 import com.practice.delivery.repository.UserRepository
 import com.practice.delivery.service.UserService
@@ -105,6 +107,20 @@ class UserServiceImpl(
                 }
             }
         }
+        return res
+    }
+
+    override fun viewRegisterAdminList(userDetails: UserDetailsImpl): ViewRegisterAdminRequestListResponseDto {
+        var res = ViewRegisterAdminRequestListResponseDto()
+        var simpleRegisterAdminRequestList = arrayListOf<SimpleRegisterAdminRequest>()
+        var adminUserRequestList = adminUserRequestRepository.findByStatus(AdminUserRequest.Status.AWAIT)
+        for (adminUserRequest in adminUserRequestList){
+            var simpleRegisterAdminRequest = SimpleRegisterAdminRequest(adminUserRequest)
+            simpleRegisterAdminRequestList.add(simpleRegisterAdminRequest)
+        }
+        res.simpleRequestList = simpleRegisterAdminRequestList
+        res.msg = "성공적으로 불러왔습니다."
+        res.code = HttpServletResponse.SC_BAD_REQUEST
         return res
     }
 
