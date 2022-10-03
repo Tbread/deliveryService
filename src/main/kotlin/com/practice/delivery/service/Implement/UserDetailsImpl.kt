@@ -2,6 +2,7 @@ package com.practice.delivery.service.Implement
 
 import com.practice.delivery.entity.User
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 class UserDetailsImpl(private var user: User) : UserDetails {
@@ -15,7 +16,9 @@ class UserDetailsImpl(private var user: User) : UserDetails {
     }
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority>? {
-        return null
+        var authorities = arrayListOf<GrantedAuthority>()
+        authorities.add(SimpleGrantedAuthority(user.getAuth()))
+        return authorities
     }
 
     override fun getPassword(): String {

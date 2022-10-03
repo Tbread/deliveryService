@@ -63,7 +63,7 @@ class UserServiceImpl(
             res.code = HttpServletResponse.SC_BAD_REQUEST
             res.msg = bindingResult.allErrors[0].defaultMessage
         } else {
-            if (req.role == Role.ROLE_SUPERIOR_ADMIN) {
+            if (req.role == Role.SUPERIOR_ADMIN) {
                 res.code = HttpServletResponse.SC_BAD_REQUEST
                 res.msg = "유효하지 않은 요청입니다."
             } else {
@@ -112,15 +112,25 @@ class UserServiceImpl(
 
     override fun viewRegisterAdminList(userDetails: UserDetailsImpl): ViewRegisterAdminRequestListResponseDto {
         var res = ViewRegisterAdminRequestListResponseDto()
-        var simpleRegisterAdminRequestList = arrayListOf<SimpleRegisterAdminRequest>()
-        var adminUserRequestList = adminUserRequestRepository.findByStatus(AdminUserRequest.Status.AWAIT)
-        for (adminUserRequest in adminUserRequestList){
-            var simpleRegisterAdminRequest = SimpleRegisterAdminRequest(adminUserRequest)
-            simpleRegisterAdminRequestList.add(simpleRegisterAdminRequest)
+        if (Objects.isNull(userDetails.getUser())) {
+            res.code = HttpServletResponse.SC_FORBIDDEN
+            res.msg = "권한이 부족합니다."
+        } else {
+            if ("ADMIN" !in userDetails.getUser().getAuthorities()){
+                res.code = HttpServletResponse.SC_FORBIDDEN
+                res.msg = "권한이 부족합니다."
+            } else {
+                var simpleRegisterAdminRequestList = arrayListOf<SimpleRegisterAdminRequest>()
+                var adminUserRequestList = adminUserRequestRepository.findByStatus(AdminUserRequest.Status.AWAIT)
+                for (adminUserRequest in adminUserRequestList) {
+                    var simpleRegisterAdminRequest = SimpleRegisterAdminRequest(adminUserRequest)
+                    simpleRegisterAdminRequestList.add(simpleRegisterAdminRequest)
+                }
+                res.simpleRequestList = simpleRegisterAdminRequestList
+                res.msg = "성공적으로 불러왔습니다."
+                res.code = HttpServletResponse.SC_OK
+            }
         }
-        res.simpleRequestList = simpleRegisterAdminRequestList
-        res.msg = "성공적으로 불러왔습니다."
-        res.code = HttpServletResponse.SC_OK
         return res
     }
 

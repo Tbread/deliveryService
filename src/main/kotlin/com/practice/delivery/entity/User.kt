@@ -3,11 +3,7 @@ package com.practice.delivery.entity
 import com.practice.delivery.utils.Timestamped
 import java.time.LocalDate
 import java.time.LocalDateTime
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 class User : Timestamped() {
@@ -28,8 +24,9 @@ class User : Timestamped() {
     @Column(nullable = true)
     var lastOrderDate: LocalDate? = null
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var role:Role = Role.ROLE_DEFAULT
+    var role:Role = Role.DEFAULT
 
     fun updateOrderDate() {
         this.lastOrderDate = LocalDate.now()
@@ -39,5 +36,31 @@ class User : Timestamped() {
         this.lastLoginDate = LocalDateTime.now()
     }
 
+    fun getAuth(): String {
+        return this.role.toString()
+    }
 
+    fun getAuthorities(): List<String>{
+        var authoritiesList = arrayListOf<String>()
+        when (this.role) {
+            Role.SUPERIOR_ADMIN -> {
+                authoritiesList.add(Role.SUPERIOR_ADMIN.toString())
+                authoritiesList.add(Role.ADMIN.toString())
+                authoritiesList.add(Role.BUSINESS.toString())
+                authoritiesList.add(Role.DEFAULT.toString())
+            }
+            Role.ADMIN -> {
+                authoritiesList.add(Role.ADMIN.toString())
+                authoritiesList.add(Role.BUSINESS.toString())
+                authoritiesList.add(Role.DEFAULT.toString())
+            }
+            Role.BUSINESS -> {
+                authoritiesList.add(Role.BUSINESS.toString())
+            }
+            else -> {
+                authoritiesList.add(Role.DEFAULT.toString())
+            }
+        }
+        return authoritiesList
+    }
 }
