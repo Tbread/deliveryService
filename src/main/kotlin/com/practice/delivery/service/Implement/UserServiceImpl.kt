@@ -116,7 +116,7 @@ class UserServiceImpl(
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
         } else {
-            if ("ADMIN" !in userDetails.getUser().getAuthorities()){
+            if ("SUPERIOR_ADMIN" !in userDetails.getUser().getAuthorities()){
                 res.code = HttpServletResponse.SC_FORBIDDEN
                 res.msg = "권한이 부족합니다."
             } else {
