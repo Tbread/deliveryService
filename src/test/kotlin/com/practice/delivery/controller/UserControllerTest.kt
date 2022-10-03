@@ -287,26 +287,7 @@ class UserControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("11.운영자 가입 신청 조회-성공-일반관리자")
-    @Throws(Exception::class)
-    fun viewRegisterAdminRequestSuccess(){
-
-        //when
-        var resultActions = mockMvc.perform(get("/user/register-admin-request-list")
-            .header("Authorization",adminToken)
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
-
-        //then
-        resultActions
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("code").value(200))
-            .andExpect(jsonPath("msg").value("성공적으로 불러왔습니다."))
-            .andExpect(jsonPath("simpleRequestList").isArray)
-    }
-
-    @Test
-    @Transactional
-    @DisplayName("12.운영자 가입 신청 조회-성공-최상위관리자")
+    @DisplayName("11.운영자 가입 신청 조회-성공-최상위관리자")
     @Throws(Exception::class)
     fun viewRegisterSuperiorAdminRequestSuccess(){
 
@@ -325,7 +306,7 @@ class UserControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("13.운영자 가입 신청 조회-실패-권한부족")
+    @DisplayName("12.운영자 가입 신청 조회-실패-권한부족")
     @Throws(Exception::class)
     fun viewRegisterAdminRequestFailLackAuthority(){
 
