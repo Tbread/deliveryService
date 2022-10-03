@@ -48,26 +48,33 @@ class UserControllerTest {
     var defaultToken = ""
     var businessToken = ""
     var adminToken = ""
+    var superiorAdminToken = ""
     @BeforeEach
     fun setup(){
         var defaultUser = User()
         var businessUser = User()
         var adminUser = User()
+        var superiorAdminUser = User()
         defaultUser.email = "default@email.com"
         businessUser.email = "business@email.com"
         adminUser.email = "admin@email.com"
+        superiorAdminUser.email = "superiorAdmin@email.com"
         defaultUser.password = "123"
         businessUser.password = "123"
         adminUser.password = "123"
+        superiorAdminUser.password = "123"
         defaultUser.role = Role.DEFAULT
         businessUser.role = Role.BUSINESS
         adminUser.role = Role.ADMIN
+        superiorAdminUser.role = Role.SUPERIOR_ADMIN
         userRepository.save(defaultUser)
         userRepository.save(businessUser)
         userRepository.save(adminUser)
+        userRepository.save(superiorAdminUser)
         defaultToken = jwtTokenProvider.createToken(defaultUser.email,defaultUser.id)
         businessToken = jwtTokenProvider.createToken(businessUser.email,businessUser.id)
         adminToken = jwtTokenProvider.createToken(adminUser.email,adminUser.id)
+        superiorAdminToken = jwtTokenProvider.createToken(superiorAdminUser.email,superiorAdminUser.id)
     }
 
 
@@ -280,7 +287,7 @@ class UserControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("11.운영자 가입 신청 조회-성공")
+    @DisplayName("11.운영자 가입 신청 조회-성공-일반관리자")
     @Throws(Exception::class)
     fun viewRegisterAdminRequestSuccess(){
 
@@ -299,7 +306,26 @@ class UserControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("12.운영자 가입 신청 조회-실패-권한부족")
+    @DisplayName("12.운영자 가입 신청 조회-성공-최상위관리자")
+    @Throws(Exception::class)
+    fun viewRegisterSuperiorAdminRequestSuccess(){
+
+        //when
+        var resultActions = mockMvc.perform(get("/user/register-admin-request-list")
+            .header("Authorization",superiorAdminToken)
+            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+
+        //then
+        resultActions
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("code").value(200))
+            .andExpect(jsonPath("msg").value("성공적으로 불러왔습니다."))
+            .andExpect(jsonPath("simpleRequestList").isArray)
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("13.운영자 가입 신청 조회-실패-권한부족")
     @Throws(Exception::class)
     fun viewRegisterAdminRequestFailLackAuthority(){
 
