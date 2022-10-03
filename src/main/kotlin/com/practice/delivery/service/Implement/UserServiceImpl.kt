@@ -134,4 +134,13 @@ class UserServiceImpl(
         return res
     }
 
+    override fun acceptRegisterAdmin(userDetails: UserDetailsImpl, id: Long): Any {
+        TODO("Not yet implemented")
+    }
+
+    override fun denyRegisterAdmin(userDetails: UserDetailsImpl, id: Long): Any {
+        TODO("Not yet implemented")
+    }
+
+
 }

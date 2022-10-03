@@ -20,4 +20,7 @@ interface UserService {
 
     fun viewRegisterAdminList(userDetails:UserDetailsImpl):ViewRegisterAdminRequestListResponseDto
 
+    fun acceptRegisterAdmin(userDetails: UserDetailsImpl,id:Long):Any
+
+    fun denyRegisterAdmin(userDetails: UserDetailsImpl,id:Long):Any
 }
