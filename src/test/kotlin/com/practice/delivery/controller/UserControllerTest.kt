@@ -80,7 +80,7 @@ class UserControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("01.회원가입-일반회원-정상")
+    @DisplayName("회원가입-일반회원-정상")
     @Throws(Exception::class)
     fun registerDefaultSuccess(){
 
@@ -103,7 +103,7 @@ class UserControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("02.회원가입-어드민-정상")
+    @DisplayName("회원가입-어드민-정상")
     @Throws(Exception::class)
     fun registerAdminSuccess(){
 
@@ -126,7 +126,7 @@ class UserControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("03.회원가입-실패-이메일누락")
+    @DisplayName("회원가입-실패-이메일누락")
     @Throws(Exception::class)
     fun registerFailNullEmail(){
 
@@ -149,7 +149,30 @@ class UserControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("04.회원가입-실패-비밀번호 누락")
+    @DisplayName("회원가입-실패-잘못된이메일형식")
+    @Throws(Exception::class)
+    fun registerFailWrongEmailForm(){
+
+        //give
+        var registerRequest = RegisterUserRequestDto("asd","123",Role.DEFAULT)
+
+        //when
+        var resultActions = mockMvc.perform(post("/user/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerRequest))
+            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+
+        //then
+        resultActions
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("code").value(400))
+            .andExpect(jsonPath("msg").value("유효하지 않은 이메일형식입니다."))
+            .andExpect(jsonPath("email").value(null))
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("회원가입-실패-비밀번호 누락")
     @Throws(Exception::class)
     fun registerFailNullPassword(){
 
@@ -172,7 +195,7 @@ class UserControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("05.회원가입-실패-역할 누락")
+    @DisplayName("회원가입-실패-역할 누락")
     @Throws(Exception::class)
     fun registerFailNullRole(){
 
@@ -195,7 +218,7 @@ class UserControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("06.회원가입-실패-최상위관리자 요청")
+    @DisplayName("회원가입-실패-최상위관리자 요청")
     @Throws(Exception::class)
     fun registerFailWrongRole(){
 
@@ -218,7 +241,7 @@ class UserControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("07.회원가입-실패-존재하는 이메일")
+    @DisplayName("회원가입-실패-존재하는 이메일")
     @Throws(Exception::class)
     fun registerFailDubEmail(){
 
@@ -241,7 +264,7 @@ class UserControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("09.로그인-실패-잘못된 이메일")
+    @DisplayName("로그인-실패-잘못된 이메일")
     @Throws(Exception::class)
     fun registerFailWrongEmail(){
 
@@ -264,7 +287,7 @@ class UserControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("10.로그인-실패-잘못된 비밀번호")
+    @DisplayName("로그인-실패-잘못된 비밀번호")
     @Throws(Exception::class)
     fun registerFailWrongPassword(){
 
@@ -287,7 +310,7 @@ class UserControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("11.운영자 가입 신청 조회-성공-최상위관리자")
+    @DisplayName("운영자 가입 신청 조회-성공-최상위관리자")
     @Throws(Exception::class)
     fun viewRegisterSuperiorAdminRequestSuccess(){
 
@@ -306,7 +329,7 @@ class UserControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("12.운영자 가입 신청 조회-실패-권한부족")
+    @DisplayName("운영자 가입 신청 조회-실패-권한부족")
     @Throws(Exception::class)
     fun viewRegisterAdminRequestFailLackAuthority(){
 
