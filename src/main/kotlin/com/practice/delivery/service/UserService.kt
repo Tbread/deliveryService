@@ -3,6 +3,7 @@ package com.practice.delivery.service
 import com.practice.delivery.dto.request.LoginRequestDto
 import com.practice.delivery.dto.request.RegisterUserRequestDto
 import com.practice.delivery.dto.response.LoginResponseDto
+import com.practice.delivery.dto.response.ManageRegisterAdminRequestResponseDto
 import com.practice.delivery.dto.response.RegisterUserResponseDto
 import com.practice.delivery.dto.response.ViewRegisterAdminRequestListResponseDto
 import com.practice.delivery.service.Implement.UserDetailsImpl
@@ -20,7 +21,7 @@ interface UserService {
 
     fun viewRegisterAdminList(userDetails:UserDetailsImpl):ViewRegisterAdminRequestListResponseDto
 
-    fun acceptRegisterAdmin(userDetails: UserDetailsImpl,id:Long):Any
+    fun acceptRegisterAdmin(userDetails: UserDetailsImpl,id:Long): ManageRegisterAdminRequestResponseDto
 
-    fun denyRegisterAdmin(userDetails: UserDetailsImpl,id:Long):Any
+    fun denyRegisterAdmin(userDetails: UserDetailsImpl,id:Long):ManageRegisterAdminRequestResponseDto
 }

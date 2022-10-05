@@ -3,6 +3,7 @@ package com.practice.delivery.service.Implement
 import com.practice.delivery.dto.request.LoginRequestDto
 import com.practice.delivery.dto.request.RegisterUserRequestDto
 import com.practice.delivery.dto.response.LoginResponseDto
+import com.practice.delivery.dto.response.ManageRegisterAdminRequestResponseDto
 import com.practice.delivery.dto.response.RegisterUserResponseDto
 import com.practice.delivery.dto.response.ViewRegisterAdminRequestListResponseDto
 import com.practice.delivery.entity.AdminUserRequest
@@ -134,12 +135,59 @@ class UserServiceImpl(
         return res
     }
 
-    override fun acceptRegisterAdmin(userDetails: UserDetailsImpl, id: Long): Any {
-        TODO("Not yet implemented")
+    override fun acceptRegisterAdmin(userDetails: UserDetailsImpl, id: Long): ManageRegisterAdminRequestResponseDto {
+        var res = ManageRegisterAdminRequestResponseDto()
+        if (Objects.isNull(userDetails.getUser())){
+            res.code = HttpServletResponse.SC_FORBIDDEN
+            res.msg = "권한이 부족합니다."
+        } else {
+            if ("SUPERIOR_ADMIN" !in userDetails.getUser().getAuthorities()){
+                res.code = HttpServletResponse.SC_FORBIDDEN
+                res.msg = "권한이 부족합니다."
+            } else {
+                var adminUserRequest = adminUserRequestRepository.findById(id)
+                if (Objects.isNull(adminUserRequest)){
+                    res.code = HttpServletResponse.SC_BAD_REQUEST
+                    res.msg = "존재하지 않는 요청 ID입니다."
+                } else {
+                    adminUserRequest.get().acceptRequest(userDetails.getUser())
+                    var adminUser = User()
+                    adminUser.email = adminUserRequest.get().email
+                    adminUser.password = adminUserRequest.get().password
+                    adminUser.role = Role.ADMIN
+                    userRepository.save(adminUser)
+                    res.code = HttpServletResponse.SC_OK
+                    res.msg = "성공적으로 수락하였습니다."
+                    res.simpleRegisterAdminRequest = SimpleRegisterAdminRequest(adminUserRequest.get())
+                }
+            }
+        }
+        return res
     }
 
-    override fun denyRegisterAdmin(userDetails: UserDetailsImpl, id: Long): Any {
-        TODO("Not yet implemented")
+    override fun denyRegisterAdmin(userDetails: UserDetailsImpl, id: Long): ManageRegisterAdminRequestResponseDto {
+        var res = ManageRegisterAdminRequestResponseDto()
+        if (Objects.isNull(userDetails.getUser())){
+            res.code = HttpServletResponse.SC_FORBIDDEN
+            res.msg = "권한이 부족합니다."
+        } else {
+            if ("SUPERIOR_ADMIN" !in userDetails.getUser().getAuthorities()){
+                res.code = HttpServletResponse.SC_FORBIDDEN
+                res.msg = "권한이 부족합니다."
+            } else {
+                var adminUserRequest = adminUserRequestRepository.findById(id)
+                if (Objects.isNull(adminUserRequest)){
+                    res.code = HttpServletResponse.SC_BAD_REQUEST
+                    res.msg = "존재하지 않는 요청 ID입니다."
+                } else {
+                    adminUserRequest.get().denyRequest(userDetails.getUser())
+                    res.code = HttpServletResponse.SC_OK
+                    res.msg = "성공적으로 거절하였습니다."
+                    res.simpleRegisterAdminRequest = SimpleRegisterAdminRequest(adminUserRequest.get())
+                }
+            }
+        }
+        return res
     }
 
 
