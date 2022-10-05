@@ -70,7 +70,7 @@ class UserServiceImpl(
                 res.code = HttpServletResponse.SC_BAD_REQUEST
                 res.msg = "유효하지 않은 요청입니다."
             } else {
-                if (userRepository.existsByEmail(req.email!!) or adminUserRequestRepository.existsByEmail(req.email)) {
+                if (userRepository.existsByEmail(req.email!!) or adminUserRequestRepository.existsByEmailAndStatus(req.email,AdminUserRequest.Status.AWAIT)) {
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "이미 존재하는 이메일입니다."
                 } else {
