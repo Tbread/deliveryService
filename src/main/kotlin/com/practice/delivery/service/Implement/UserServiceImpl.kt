@@ -18,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.BindingResult
+import java.time.LocalDateTime
 import java.util.Objects
 import javax.servlet.http.HttpServletResponse
 
@@ -58,6 +59,7 @@ class UserServiceImpl(
         return res
     }
 
+    @Transactional
     override fun registerAdminUser(req: RegisterUserRequestDto, bindingResult: BindingResult): RegisterUserResponseDto {
         var res = RegisterUserResponseDto()
         if (bindingResult.hasErrors()) {
@@ -86,6 +88,7 @@ class UserServiceImpl(
         return res
     }
 
+    @Transactional
     override fun login(req: LoginRequestDto, bindingResult: BindingResult): LoginResponseDto {
         var res = LoginResponseDto()
         if (bindingResult.hasErrors()) {
@@ -102,6 +105,7 @@ class UserServiceImpl(
                     res.msg = "잘못된 이메일 또는 패스워드입니다."
                 } else {
                     val token = jwtTokenProvider.createToken(loadedUser.email, loadedUser.id)
+                    loadedUser.lastLoginDate = LocalDateTime.now()
                     res.code = HttpServletResponse.SC_OK
                     res.msg = "성공적으로 로그인 하였습니다."
                     res.token = token
@@ -135,6 +139,7 @@ class UserServiceImpl(
         return res
     }
 
+    @Transactional
     override fun acceptRegisterAdmin(userDetails: UserDetailsImpl, id: Long): ManageRegisterAdminRequestResponseDto {
         var res = ManageRegisterAdminRequestResponseDto()
         if (Objects.isNull(userDetails.getUser())){
@@ -165,6 +170,7 @@ class UserServiceImpl(
         return res
     }
 
+    @Transactional
     override fun denyRegisterAdmin(userDetails: UserDetailsImpl, id: Long): ManageRegisterAdminRequestResponseDto {
         var res = ManageRegisterAdminRequestResponseDto()
         if (Objects.isNull(userDetails.getUser())){
