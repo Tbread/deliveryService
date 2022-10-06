@@ -40,8 +40,8 @@ class StoreServiceImpl(
                         StoreRegisterRequest.Status.AWAIT
                     )
                 ) {
-                    res.code = HttpServletResponse.SC_FORBIDDEN
-                    res.msg = "이미 등록되거나 신청 대기 상태입니다"
+                    res.code = HttpServletResponse.SC_BAD_REQUEST
+                    res.msg = "이미 등록되었거나 신청 대기 상태입니다"
                 } else {
                     if (bindingResult.hasErrors()) {
                         res.code = HttpServletResponse.SC_BAD_REQUEST
@@ -49,7 +49,7 @@ class StoreServiceImpl(
                     } else {
                         var registerRequest = StoreRegisterRequest()
                         registerRequest.owner = userDetails.getUser()
-                        registerRequest.storeName = req.storeName
+                        registerRequest.storeName = req.storeName!!
                         registerRequest.storeDesc = req.storeDesc
                         registerRequest.storeImgSrc = req.storeImgSrc
                         if (Objects.isNull(req.minOrderPrice)) {
