@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface StoreRegisterRequestRepository:JpaRepository<StoreRegisterRequest,Long> {
     fun findByOwner(owner:User):StoreRegisterRequest?
     fun existsByOwnerAndStatus(owner: User,status:StoreRegisterRequest.Status):Boolean
+
+    fun findByStatus(status: StoreRegisterRequest.Status):List<StoreRegisterRequest>
 }

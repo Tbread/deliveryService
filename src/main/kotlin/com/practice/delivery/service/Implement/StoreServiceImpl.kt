@@ -2,7 +2,9 @@ package com.practice.delivery.service.Implement
 
 import com.practice.delivery.dto.request.RegisterStoreRequestDto
 import com.practice.delivery.dto.response.RegisterStoreResponseDto
+import com.practice.delivery.dto.response.ViewRegisterStoreRequestListResponseDto
 import com.practice.delivery.entity.StoreRegisterRequest
+import com.practice.delivery.model.SimpleRegisterStoreRequest
 import com.practice.delivery.repository.StoreRegisterRequestRepository
 import com.practice.delivery.repository.StoreRepository
 import com.practice.delivery.service.StoreService
@@ -67,8 +69,28 @@ class StoreServiceImpl(
         return res
     }
 
-    override fun viewRegisterStoreRequestList(userDetails: UserDetailsImpl): Any {
-        TODO("Not yet implemented")
+    override fun viewRegisterStoreRequestList(userDetails: UserDetailsImpl): ViewRegisterStoreRequestListResponseDto {
+        var res = ViewRegisterStoreRequestListResponseDto()
+        if (Objects.isNull(userDetails.getUser())){
+            res.code = HttpServletResponse.SC_FORBIDDEN
+            res.msg = "권한이 부족합니다."
+        } else {
+            if("ADMIN" !in userDetails.getUser().getAuthorities()){
+                res.code = HttpServletResponse.SC_FORBIDDEN
+                res.msg = "권한이 부족합니다."
+            } else {
+                var storeRegisterRequestList = storeRegisterRequestRepository.findByStatus(StoreRegisterRequest.Status.AWAIT)
+                var simpleRequestList = arrayListOf<SimpleRegisterStoreRequest>()
+                for (request in storeRegisterRequestList){
+                    var simpleRequest = SimpleRegisterStoreRequest(request)
+                    simpleRequestList.add(simpleRequest)
+                }
+                res.code = HttpServletResponse.SC_OK
+                res.msg = "성공적으로 불러왔습니다."
+                res.simpleRequestList = simpleRequestList
+            }
+        }
+        return res
     }
 
     @Transactional
