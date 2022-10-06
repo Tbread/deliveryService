@@ -8,6 +8,7 @@ import com.practice.delivery.dto.request.RegisterUserRequestDto
 import com.practice.delivery.entity.Role
 import com.practice.delivery.entity.User
 import com.practice.delivery.jwt.JwtTokenProvider
+import com.practice.delivery.repository.AdminUserRequestRepository
 import com.practice.delivery.repository.UserRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -44,6 +45,9 @@ class UserControllerTest {
 
     @Autowired
     lateinit var jwtTokenProvider: JwtTokenProvider
+
+    @Autowired
+    lateinit var adminUserRequestRepository: AdminUserRequestRepository
 
     var defaultToken = ""
     var businessToken = ""
@@ -346,5 +350,148 @@ class UserControllerTest {
             .andExpect(jsonPath("simpleRequestList").isEmpty)
     }
 
+
+    @Test
+    @Transactional
+    @DisplayName("운영자 가입 신청 수락 - 성공")
+    @Throws(Exception::class)
+    fun registerAdminAcceptSuccess(){
+        //given
+        var registerRequest = RegisterUserRequestDto("test@default.com","456",Role.ADMIN)
+        mockMvc.perform(post("/user/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerRequest))
+            .accept(MediaType.APPLICATION_JSON))
+        var id = adminUserRequestRepository.findByEmail("test@default.com")!!.id
+
+        //when
+        var resultActions = mockMvc.perform(get("/user/accept-admin-request/$id")
+            .header("Authorization",superiorAdminToken)
+            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+
+        //then
+        resultActions
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("code").value(200))
+            .andExpect(jsonPath("msg").value("성공적으로 수락하였습니다."))
+            .andExpect(jsonPath("simpleRegisterAdminRequest").hasJsonPath())
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("운영자 가입 신청 수락 - 실패 - 잘못된 ID")
+    @Throws(Exception::class)
+    fun registerAdminAcceptFailWrongId(){
+        var id:Long = 99999999L
+        //when
+        var resultActions = mockMvc.perform(get("/user/accept-admin-request/$id")
+            .header("Authorization",superiorAdminToken)
+            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+
+        //then
+        resultActions
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("code").value(400))
+            .andExpect(jsonPath("msg").value("존재하지 않는 요청 ID입니다."))
+            .andExpect(jsonPath("simpleRegisterAdminRequest").isEmpty)
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("운영자 가입 신청 수락 - 실패 - 권한 부족")
+    @Throws(Exception::class)
+    fun registerAdminAcceptFailLackAuthority(){
+        //given
+        var registerRequest = RegisterUserRequestDto("test@default.com","456",Role.ADMIN)
+        mockMvc.perform(post("/user/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerRequest))
+            .accept(MediaType.APPLICATION_JSON))
+        var id = adminUserRequestRepository.findByEmail("test@default.com")!!.id
+
+        //when
+        var resultActions = mockMvc.perform(get("/user/accept-admin-request/$id")
+            .header("Authorization",adminToken)
+            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+
+        //then
+        resultActions
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("code").value(403))
+            .andExpect(jsonPath("msg").value("권한이 부족합니다."))
+            .andExpect(jsonPath("simpleRegisterAdminRequest").isEmpty)
+    }
+
+
+    @Test
+    @Transactional
+    @DisplayName("운영자 가입 신청 거절 - 성공")
+    @Throws(Exception::class)
+    fun registerAdminDenySuccess(){
+        //given
+        var registerRequest = RegisterUserRequestDto("test@default.com","456",Role.ADMIN)
+        mockMvc.perform(post("/user/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerRequest))
+            .accept(MediaType.APPLICATION_JSON))
+        var id = adminUserRequestRepository.findByEmail("test@default.com")!!.id
+
+        //when
+        var resultActions = mockMvc.perform(get("/user/deny-admin-request/$id")
+            .header("Authorization",superiorAdminToken)
+            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+
+        //then
+        resultActions
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("code").value(200))
+            .andExpect(jsonPath("msg").value("성공적으로 거절하였습니다."))
+            .andExpect(jsonPath("simpleRegisterAdminRequest").hasJsonPath())
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("운영자 가입 신청 거절- 실패 - 잘못된 ID")
+    @Throws(Exception::class)
+    fun registerAdminDenyFailWrongId(){
+        var id:Long = 999999999L
+        //when
+        var resultActions = mockMvc.perform(get("/user/deny-admin-request/$id")
+            .header("Authorization",superiorAdminToken)
+            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+
+        //then
+        resultActions
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("code").value(400))
+            .andExpect(jsonPath("msg").value("존재하지 않는 요청 ID입니다."))
+            .andExpect(jsonPath("simpleRegisterAdminRequest").isEmpty)
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("운영자 가입 신청 거절 - 실패 - 권한 부족")
+    @Throws(Exception::class)
+    fun registerAdminDenyFailLackAuthority(){
+        //given
+        var registerRequest = RegisterUserRequestDto("test@default.com","456",Role.ADMIN)
+        mockMvc.perform(post("/user/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerRequest))
+            .accept(MediaType.APPLICATION_JSON))
+        var id = adminUserRequestRepository.findByEmail("test@default.com")!!.id
+
+        //when
+        var resultActions = mockMvc.perform(get("/user/deny-admin-request/$id")
+            .header("Authorization",adminToken)
+            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+
+        //then
+        resultActions
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("code").value(403))
+            .andExpect(jsonPath("msg").value("권한이 부족합니다."))
+            .andExpect(jsonPath("simpleRegisterAdminRequest").isEmpty)
+    }
 
 }

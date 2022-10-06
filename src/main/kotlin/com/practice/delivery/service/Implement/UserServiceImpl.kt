@@ -151,7 +151,7 @@ class UserServiceImpl(
                 res.msg = "권한이 부족합니다."
             } else {
                 var adminUserRequest = adminUserRequestRepository.findById(id)
-                if (Objects.isNull(adminUserRequest)){
+                if (!adminUserRequestRepository.existsById(id)){
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "존재하지 않는 요청 ID입니다."
                 } else {
@@ -182,7 +182,7 @@ class UserServiceImpl(
                 res.msg = "권한이 부족합니다."
             } else {
                 var adminUserRequest = adminUserRequestRepository.findById(id)
-                if (Objects.isNull(adminUserRequest)){
+                if (!adminUserRequestRepository.existsById(id)){
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "존재하지 않는 요청 ID입니다."
                 } else {
