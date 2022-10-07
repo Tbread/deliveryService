@@ -3,10 +3,7 @@ package com.practice.delivery.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.practice.delivery.dto.request.AddMenuRequestDto
 import com.practice.delivery.dto.request.RegisterStoreRequestDto
-import com.practice.delivery.entity.Role
-import com.practice.delivery.entity.Store
-import com.practice.delivery.entity.StoreRegisterRequest
-import com.practice.delivery.entity.User
+import com.practice.delivery.entity.*
 import com.practice.delivery.jwt.JwtTokenProvider
 import com.practice.delivery.model.OptionMenu
 import com.practice.delivery.repository.*
@@ -750,6 +747,182 @@ class StoreControllerTest {
     /*
     여기까지 메뉴 조회 로직 관련
     */
+
+    /*
+    여기부터 메뉴 삭제 로직 관련
+     */
+
+    @Test
+    @Transactional
+    @DisplayName("메뉴 제거-성공-옵션메뉴없음")
+    @Throws(Exception::class)
+    fun removeMenuSuccessNullOptionalMenu() {
+        var store = Store()
+        store.storeName = "testStoreName"
+        store.owner = userRepository.findByEmail("business@email.com")
+        storeRepository.save(store)
+        var menu = Menu()
+        menu.store = store
+        menu.menuName = "testMenuName"
+        menu.price = 100
+        menuRepository.save(menu)
+        var id = menu.id
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.delete("/store/remove-menu/$id")
+                .header("Authorization", businessToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("성공적으로 삭제하였습니다."))
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("메뉴 제거-성공-옵션메뉴있음")
+    @Throws(Exception::class)
+    fun removeMenuSuccessExistOptionalMenu() {
+        var store = Store()
+        store.storeName = "testStoreName"
+        store.owner = userRepository.findByEmail("business@email.com")
+        storeRepository.save(store)
+        var menu = Menu()
+        menu.store = store
+        menu.menuName = "testMenuName"
+        menu.price = 100
+        menu.thisHasOption = true
+        menuRepository.save(menu)
+        var subMenu = Menu()
+        subMenu.store = store
+        subMenu.menuName = "optionMenu"
+        subMenu.price = 100
+        subMenu.thisIsOption = true
+        menuRepository.save(subMenu)
+        var menuOption = MenuOption()
+        menuOption.topMenu = menu
+        menuOption.subMenu = subMenu
+        menuOptionRepository.save(menuOption)
+        var id = menu.id
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.delete("/store/remove-menu/$id")
+                .header("Authorization", businessToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("성공적으로 삭제하였습니다."))
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("메뉴 제거-성공-옵션메뉴")
+    @Throws(Exception::class)
+    fun removeMenuSuccessIsOptionalMenu() {
+        var store = Store()
+        store.storeName = "testStoreName"
+        store.owner = userRepository.findByEmail("business@email.com")
+        storeRepository.save(store)
+        var menu = Menu()
+        menu.store = store
+        menu.menuName = "testMenuName"
+        menu.price = 100
+        menu.thisHasOption = true
+        menuRepository.save(menu)
+        var subMenu = Menu()
+        subMenu.store = store
+        subMenu.menuName = "optionMenu"
+        subMenu.price = 100
+        subMenu.thisIsOption = true
+        menuRepository.save(subMenu)
+        var menuOption = MenuOption()
+        menuOption.topMenu = menu
+        menuOption.subMenu = subMenu
+        menuOptionRepository.save(menuOption)
+        var id = subMenu.id
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.delete("/store/remove-menu/$id")
+                .header("Authorization", businessToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("성공적으로 삭제하였습니다."))
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("메뉴 제거-실패-권한부족")
+    @Throws(Exception::class)
+    fun removeMenuFailLackAuthority() {
+        var store = Store()
+        store.storeName = "testStoreName"
+        store.owner = userRepository.findByEmail("business@email.com")
+        storeRepository.save(store)
+        var menu = Menu()
+        menu.store = store
+        menu.menuName = "testMenuName"
+        menu.price = 100
+        menu.thisHasOption = true
+        menuRepository.save(menu)
+        var subMenu = Menu()
+        subMenu.store = store
+        subMenu.menuName = "optionMenu"
+        subMenu.price = 100
+        subMenu.thisIsOption = true
+        menuRepository.save(subMenu)
+        var menuOption = MenuOption()
+        menuOption.topMenu = menu
+        menuOption.subMenu = subMenu
+        menuOptionRepository.save(menuOption)
+        var id = subMenu.id
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.delete("/store/remove-menu/$id")
+                .header("Authorization", defaultToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(403))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("권한이 부족합니다."))
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("메뉴 제거-실패-잘못된 ID")
+    @Throws(Exception::class)
+    fun removeMenuFailWrongId() {
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.delete("/store/remove-menu/999999999999")
+                .header("Authorization", businessToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(400))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("존재하지 않는 메뉴 ID입니다."))
+    }
 
 
 }
