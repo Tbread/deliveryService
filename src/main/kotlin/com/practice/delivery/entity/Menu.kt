@@ -12,7 +12,7 @@ class Menu {
     @Column(nullable = false)
     var menuName:String = ""
 
-    @Column(nullable = true)
+    @Column(nullable = true,name = "\"desc\"")
     var desc:String? = null
 
     @Column(nullable = false)
