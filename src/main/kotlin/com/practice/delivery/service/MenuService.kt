@@ -1,7 +1,9 @@
 package com.practice.delivery.service
 
 import com.practice.delivery.dto.request.AddMenuRequestDto
+import com.practice.delivery.dto.request.updateMenuRequestDto
 import com.practice.delivery.dto.response.AddMenuResponseDto
+import com.practice.delivery.dto.response.DefaultResponseDto
 import com.practice.delivery.dto.response.ShowMenuResponseDto
 import com.practice.delivery.service.implemented.UserDetailsImpl
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -12,4 +14,8 @@ interface MenuService {
     fun addMenu(@AuthenticationPrincipal userDetails: UserDetailsImpl, req:AddMenuRequestDto, bindingResult: BindingResult):AddMenuResponseDto
 
     fun showMenuList(id:Long):ShowMenuResponseDto
+
+    fun removeMenu(@AuthenticationPrincipal userDetails: UserDetailsImpl,id:Long):DefaultResponseDto
+
+    fun updateMenu(@AuthenticationPrincipal userDetails: UserDetailsImpl,req:updateMenuRequestDto):DefaultResponseDto
 }

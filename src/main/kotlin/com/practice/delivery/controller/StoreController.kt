@@ -9,6 +9,7 @@ import com.practice.delivery.service.MenuService
 import com.practice.delivery.service.StoreService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -63,7 +64,12 @@ class StoreController(private var storeService: StoreService, private var menuSe
     }
 
     @GetMapping("/show-menu-list/{id}")
-    fun showMenuList(@PathVariable id:Long):ShowMenuResponseDto{
+    fun showMenuList(@PathVariable id: Long): ShowMenuResponseDto {
         return menuService.showMenuList(id)
+    }
+
+    @DeleteMapping("/remove-menu/{id}")
+    fun removeMenu(@AuthenticationPrincipal userDetails: UserDetailsImpl, @PathVariable id: Long): DefaultResponseDto {
+        return menuService.removeMenu(userDetails, id)
     }
 }

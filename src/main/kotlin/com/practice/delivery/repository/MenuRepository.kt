@@ -8,4 +8,6 @@ interface MenuRepository:JpaRepository<Menu,Long> {
     fun existsByMenuName(menuName:String):Boolean
 
     fun findByStoreAndThisIsOption(store:Store,thisIsOption:Boolean):List<Menu>
+
+    fun findByMenuName(menuName:String):Menu?
 }

@@ -1,7 +1,9 @@
 package com.practice.delivery.service.implemented
 
 import com.practice.delivery.dto.request.AddMenuRequestDto
+import com.practice.delivery.dto.request.updateMenuRequestDto
 import com.practice.delivery.dto.response.AddMenuResponseDto
+import com.practice.delivery.dto.response.DefaultResponseDto
 import com.practice.delivery.dto.response.ShowMenuResponseDto
 import com.practice.delivery.entity.Menu
 import com.practice.delivery.entity.MenuOption
@@ -103,5 +105,57 @@ class MenuServiceImpl(
             res.simpleMenuList = simpleMenuList
         }
         return res
+    }
+
+    @Transactional
+    override fun removeMenu(userDetails: UserDetailsImpl, id: Long): DefaultResponseDto {
+        var res = DefaultResponseDto()
+        if ("BUSINESS" !in userDetails.getUser().getAuthorities()){
+            res.code = HttpServletResponse.SC_FORBIDDEN
+            res.msg = "권한이 부족합니다."
+        } else {
+            var selectedMenu = menuRepository.findById(id)
+            if (Objects.isNull(selectedMenu.get())){
+                res.code = HttpServletResponse.SC_BAD_REQUEST
+                res.msg = "존재하지 않는 메뉴 ID입니다."
+            } else {
+                if (selectedMenu.get().store!!.owner != userDetails.getUser()){
+                    res.code = HttpServletResponse.SC_FORBIDDEN
+                    res.msg = "권한이 부족합니다."
+                } else {
+                    if (selectedMenu.get().thisIsOption){
+                        //옵션메뉴인 경우
+                        var menuOption = menuOptionRepository.findBySubMenu(selectedMenu.get())
+                        var topMenu = menuOption!!.topMenu
+                        var menuOptionList = menuOptionRepository.findByTopMenu(topMenu!!)
+                        if (menuOptionList.size == 1){
+                            //해당메뉴 제거시 옵션메뉴가 전부 사라지는경우
+                            topMenu.updateThisHasOption(false)
+                        }
+                        menuOptionRepository.delete(menuOption)
+                    } else {
+                        //메인메뉴인 경우
+                        if (selectedMenu.get().thisHasOption){
+                            //옵션메뉴가 존재하는경우
+                            var menuOptionList = menuOptionRepository.findByTopMenu(selectedMenu.get())
+                            for (menuOption in menuOptionList){
+                                var subMenu = menuOption.subMenu
+                                menuOptionRepository.delete(menuOption)
+                                menuRepository.delete(subMenu!!)
+                            }
+                        }
+                    }
+                    menuRepository.delete(selectedMenu.get())
+                    res.code = HttpServletResponse.SC_OK
+                    res.msg = "성공적으로 삭제하였습니다."
+                }
+            }
+        }
+       return res
+    }
+
+    @Transactional
+    override fun updateMenu(userDetails: UserDetailsImpl, req: updateMenuRequestDto): DefaultResponseDto {
+        TODO("Not yet implemented")
     }
 }

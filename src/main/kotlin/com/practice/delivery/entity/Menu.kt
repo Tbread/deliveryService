@@ -54,4 +54,8 @@ class Menu {
     fun updatePrice(price:Int){
         this.price = price
     }
+
+    fun updateThisHasOption(boolean: Boolean){
+        this.thisHasOption = boolean
+    }
 }
