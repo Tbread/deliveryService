@@ -1,4 +1,4 @@
-package com.practice.delivery.service.implement
+package com.practice.delivery.service.implemented
 
 import com.practice.delivery.entity.User
 import com.practice.delivery.repository.UserRepository

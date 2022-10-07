@@ -1,4 +1,4 @@
-package com.practice.delivery.service.implement
+package com.practice.delivery.service.implemented
 
 import com.practice.delivery.dto.request.AddMenuRequestDto
 import com.practice.delivery.dto.response.AddMenuResponseDto
@@ -54,12 +54,12 @@ class MenuServiceImpl(
                         mainMenu.isOption = false
                         mainMenu.price = req.price!!
                         menuRepository.save(mainMenu)
-                        if (mainMenu.hasOption!!){
+                        if (mainMenu.hasOption){
                             for (subMenuRequest:OptionMenu in req.optionMenuList!!){
                                 var subMenu = Menu()
                                 var menuOption = MenuOption()
-                                subMenu.menuName = subMenuRequest.name!!
-                                subMenu.price = subMenuRequest.price!!
+                                subMenu.menuName = subMenuRequest.name
+                                subMenu.price = subMenuRequest.price
                                 subMenu.isOption = true
                                 menuRepository.save(subMenu)
                                 menuOption.topMenu = mainMenu

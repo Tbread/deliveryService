@@ -1,4 +1,4 @@
-package com.practice.delivery.service.implement
+package com.practice.delivery.service.implemented
 
 import com.practice.delivery.dto.request.RegisterStoreRequestDto
 import com.practice.delivery.dto.response.ManageRegisterStoreResponseDto
