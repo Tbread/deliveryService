@@ -10,4 +10,9 @@ class OptionMenu {
         this.name = menu.menuName
         this.price = menu.price
     }
+
+    constructor(name:String,price:Int){
+        this.name = name
+        this.price = price
+    }
 }

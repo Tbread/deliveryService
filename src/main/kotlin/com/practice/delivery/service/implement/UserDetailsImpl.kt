@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails
 
 class UserDetailsImpl(private var user: User) : UserDetails {
 
-    fun userdetailsImpl(user: User) {
+    fun userDetailsImpl(user: User) {
         this.user = user
     }
 
