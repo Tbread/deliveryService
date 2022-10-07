@@ -4,6 +4,7 @@ import com.practice.delivery.entity.StoreRegisterRequest
 
 class SimpleRegisterStoreRequest {
 
+    var id:Long = 0L
     var storeName:String = ""
     var applicantName:String = ""
     var storeDesc:String? = ""
@@ -11,6 +12,7 @@ class SimpleRegisterStoreRequest {
 
 
     constructor(req:StoreRegisterRequest){
+        this.id = req.id
         this.storeName = req.storeName
         this.applicantName = req.owner!!.email
         this.storeDesc = req.storeDesc
