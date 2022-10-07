@@ -1,11 +1,14 @@
 package com.practice.delivery.controller
 
+import com.practice.delivery.dto.request.AddMenuRequestDto
 import com.practice.delivery.dto.request.RegisterStoreRequestDto
+import com.practice.delivery.dto.response.AddMenuResponseDto
 import com.practice.delivery.dto.response.ManageRegisterStoreResponseDto
 import com.practice.delivery.dto.response.RegisterStoreResponseDto
 import com.practice.delivery.dto.response.ViewRegisterStoreRequestListResponseDto
 
 import com.practice.delivery.service.Implement.UserDetailsImpl
+import com.practice.delivery.service.MenuService
 import com.practice.delivery.service.StoreService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
@@ -20,7 +23,7 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/store")
-class StoreController(private var storeService: StoreService) {
+class StoreController(private var storeService: StoreService, private var menuService: MenuService) {
 
     @PostMapping("/register")
     fun registerStore(
@@ -28,22 +31,37 @@ class StoreController(private var storeService: StoreService) {
         @Valid @RequestBody req: RegisterStoreRequestDto,
         bindingResult: BindingResult
     ): RegisterStoreResponseDto {
-        return storeService.registerStore(userDetails, req,bindingResult)
+        return storeService.registerStore(userDetails, req, bindingResult)
     }
 
     @GetMapping("/register-store-request-list")
-    fun viewRegisterStoreList(@AuthenticationPrincipal userDetails: UserDetailsImpl): ViewRegisterStoreRequestListResponseDto{
+    fun viewRegisterStoreList(@AuthenticationPrincipal userDetails: UserDetailsImpl): ViewRegisterStoreRequestListResponseDto {
         return storeService.viewRegisterStoreRequestList(userDetails)
     }
 
 
     @GetMapping("/accept-register-request/{id}")
-    fun acceptRegisterStore(@AuthenticationPrincipal userDetails: UserDetailsImpl,@PathVariable id:Long):ManageRegisterStoreResponseDto{
+    fun acceptRegisterStore(
+        @AuthenticationPrincipal userDetails: UserDetailsImpl,
+        @PathVariable id: Long
+    ): ManageRegisterStoreResponseDto {
         return storeService.acceptRegisterStoreRequest(userDetails, id)
     }
 
     @GetMapping("/deny-register-request/{id}")
-    fun denyRegisterStore(@AuthenticationPrincipal userDetails: UserDetailsImpl,@PathVariable id:Long):ManageRegisterStoreResponseDto{
+    fun denyRegisterStore(
+        @AuthenticationPrincipal userDetails: UserDetailsImpl,
+        @PathVariable id: Long
+    ): ManageRegisterStoreResponseDto {
         return storeService.denyRegisterStoreRequest(userDetails, id)
+    }
+
+    @PostMapping("/add-menu")
+    fun addMenu(
+        @AuthenticationPrincipal userDetails: UserDetailsImpl,
+        @RequestBody @Valid req: AddMenuRequestDto,
+        bindingResult: BindingResult
+    ): AddMenuResponseDto {
+        return menuService.addMenu(userDetails, req, bindingResult)
     }
 }
