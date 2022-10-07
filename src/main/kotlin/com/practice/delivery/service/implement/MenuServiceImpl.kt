@@ -1,4 +1,4 @@
-package com.practice.delivery.service.Implement
+package com.practice.delivery.service.implement
 
 import com.practice.delivery.dto.request.AddMenuRequestDto
 import com.practice.delivery.dto.response.AddMenuResponseDto

@@ -1,8 +1,7 @@
-package com.practice.delivery.service.Implement
+package com.practice.delivery.service.implement
 
 import com.practice.delivery.entity.User
 import com.practice.delivery.repository.UserRepository
-import com.practice.delivery.service.Implement.UserDetailsImpl
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
