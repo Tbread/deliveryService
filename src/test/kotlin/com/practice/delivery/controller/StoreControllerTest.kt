@@ -3,6 +3,7 @@ package com.practice.delivery.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.practice.delivery.dto.request.AddMenuRequestDto
 import com.practice.delivery.dto.request.RegisterStoreRequestDto
+import com.practice.delivery.dto.request.UpdateMenuRequestDto
 import com.practice.delivery.entity.*
 import com.practice.delivery.jwt.JwtTokenProvider
 import com.practice.delivery.model.OptionMenu
@@ -924,5 +925,144 @@ class StoreControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("msg").value("존재하지 않는 메뉴 ID입니다."))
     }
 
+    /*
+    여기까지 메뉴 삭제 로직 관련
+    */
+
+    /*
+    여기부터 메뉴 업데이트 로직 관련
+    */
+
+    @Test
+    @Transactional
+    @DisplayName("메뉴 업데이트-성공")
+    @Throws(Exception::class)
+    fun updateMenuSuccess() {
+        var store = Store()
+        store.storeName = "testStoreName"
+        store.owner = userRepository.findByEmail("business@email.com")
+        storeRepository.save(store)
+        var menu = Menu()
+        menu.store = store
+        menu.menuName = "testMenuName"
+        menu.price = 100
+        menu.thisHasOption = true
+        menuRepository.save(menu)
+        var subMenu = Menu()
+        subMenu.store = store
+        subMenu.menuName = "optionMenu"
+        subMenu.price = 100
+        subMenu.thisIsOption = true
+        menuRepository.save(subMenu)
+        var menuOption = MenuOption()
+        menuOption.topMenu = menu
+        menuOption.subMenu = subMenu
+        menuOptionRepository.save(menuOption)
+        var updateMenuRequestDto = UpdateMenuRequestDto("modifiedUpdateMenuName",null,null,null,null)
+        var id = menu.id
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.patch("/store/update-menu/$id")
+                .header("Authorization", businessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateMenuRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("성공적으로 변경하였습니다."))
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("메뉴 업데이트-실패-권한부족")
+    @Throws(Exception::class)
+    fun updateMenuFailLackAuthority() {
+        var store = Store()
+        store.storeName = "testStoreName"
+        store.owner = userRepository.findByEmail("business@email.com")
+        storeRepository.save(store)
+        var menu = Menu()
+        menu.store = store
+        menu.menuName = "testMenuName"
+        menu.price = 100
+        menu.thisHasOption = true
+        menuRepository.save(menu)
+        var subMenu = Menu()
+        subMenu.store = store
+        subMenu.menuName = "optionMenu"
+        subMenu.price = 100
+        subMenu.thisIsOption = true
+        menuRepository.save(subMenu)
+        var menuOption = MenuOption()
+        menuOption.topMenu = menu
+        menuOption.subMenu = subMenu
+        menuOptionRepository.save(menuOption)
+        var updateMenuRequestDto = UpdateMenuRequestDto("modifiedUpdateMenuName",null,null,null,null)
+        var id = menu.id
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.patch("/store/update-menu/$id")
+                .header("Authorization", adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateMenuRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(403))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("권한이 부족합니다."))
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("메뉴 업데이트-실패-잘못된ID")
+    @Throws(Exception::class)
+    fun updateMenuFailWrondId() {
+        var store = Store()
+        store.storeName = "testStoreName"
+        store.owner = userRepository.findByEmail("business@email.com")
+        storeRepository.save(store)
+        var menu = Menu()
+        menu.store = store
+        menu.menuName = "testMenuName"
+        menu.price = 100
+        menu.thisHasOption = true
+        menuRepository.save(menu)
+        var subMenu = Menu()
+        subMenu.store = store
+        subMenu.menuName = "optionMenu"
+        subMenu.price = 100
+        subMenu.thisIsOption = true
+        menuRepository.save(subMenu)
+        var menuOption = MenuOption()
+        menuOption.topMenu = menu
+        menuOption.subMenu = subMenu
+        menuOptionRepository.save(menuOption)
+        var updateMenuRequestDto = UpdateMenuRequestDto("modifiedUpdateMenuName",null,null,null,null)
+        var id = menu.id
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.patch("/store/update-menu/987978979797999")
+                .header("Authorization", businessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateMenuRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(400))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("존재하지 않는 메뉴 ID입니다."))
+    }
 
 }
