@@ -3,14 +3,14 @@ package com.practice.delivery.entity
 import javax.persistence.*
 
 @Entity
-class Goods {
+class Menu {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0
 
     @Column(nullable = false)
-    var goodsName:String = ""
+    var menuName:String = ""
 
     @Column(nullable = true)
     var desc:String? = null
@@ -43,8 +43,8 @@ class Goods {
         this.desc = desc
     }
 
-    fun updateGoodsName(name:String){
-        this.goodsName = name
+    fun updateMenuName(name:String){
+        this.menuName = name
     }
 
     fun updatePrice(price:Int){
