@@ -80,6 +80,10 @@ class StoreControllerTest {
     }
 
 
+    /*
+    여기부터 가게 등록 로직 관련
+    */
+
     @Test
     @Transactional
     @DisplayName("가게 등록 신청 성공")
@@ -191,6 +195,14 @@ class StoreControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("storeName").isEmpty)
     }
 
+    /*
+    여기까지 가게 등록 로직 관련
+    */
+
+    /*
+    여기부터 가게 등록 신청 조회 로직 관련
+    */
+
 
     @Test
     @Transactional
@@ -254,6 +266,14 @@ class StoreControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("msg").value("권한이 부족합니다."))
             .andExpect(MockMvcResultMatchers.jsonPath("simpleRequestList").isEmpty)
     }
+
+    /*
+    여기까지 가게 등록 신청 조회 로직 관련
+    */
+
+    /*
+    여기부터 가게 등록 신청 수락 로직 관련
+    */
 
     @Test
     @Transactional
@@ -334,6 +354,14 @@ class StoreControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("simpleRegisterStoreRequest").isEmpty)
     }
 
+    /*
+    여기까지 가게 등록 신청 수락 로직 관련
+    */
+
+    /*
+    여기부터 가게 등록 신청 거절 로직 관련
+    */
+
     @Test
     @Transactional
     @DisplayName("가게 등록 신청 거절-성공")
@@ -412,6 +440,10 @@ class StoreControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("msg").value("존재하지 않는 요청 ID입니다."))
             .andExpect(MockMvcResultMatchers.jsonPath("simpleRegisterStoreRequest").isEmpty)
     }
+
+    /*
+    여기부터 가게 등록 신청 거절 로직 관련
+    */
 
 
 }

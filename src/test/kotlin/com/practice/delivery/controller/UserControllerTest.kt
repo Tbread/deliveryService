@@ -53,8 +53,9 @@ class UserControllerTest {
     var businessToken = ""
     var adminToken = ""
     var superiorAdminToken = ""
+
     @BeforeEach
-    fun setup(){
+    fun setup() {
         var defaultUser = User()
         var businessUser = User()
         var adminUser = User()
@@ -75,27 +76,32 @@ class UserControllerTest {
         userRepository.save(businessUser)
         userRepository.save(adminUser)
         userRepository.save(superiorAdminUser)
-        defaultToken = jwtTokenProvider.createToken(defaultUser.email,defaultUser.id)
-        businessToken = jwtTokenProvider.createToken(businessUser.email,businessUser.id)
-        adminToken = jwtTokenProvider.createToken(adminUser.email,adminUser.id)
-        superiorAdminToken = jwtTokenProvider.createToken(superiorAdminUser.email,superiorAdminUser.id)
+        defaultToken = jwtTokenProvider.createToken(defaultUser.email, defaultUser.id)
+        businessToken = jwtTokenProvider.createToken(businessUser.email, businessUser.id)
+        adminToken = jwtTokenProvider.createToken(adminUser.email, adminUser.id)
+        superiorAdminToken = jwtTokenProvider.createToken(superiorAdminUser.email, superiorAdminUser.id)
     }
 
+    /*
+    여기부터 회원가입 로직 관련
+    */
 
     @Test
     @Transactional
     @DisplayName("회원가입-일반회원-정상")
     @Throws(Exception::class)
-    fun registerDefaultSuccess(){
+    fun registerDefaultSuccess() {
 
         //give
-        var registerRequest = RegisterUserRequestDto("test@default.com","456",Role.DEFAULT)
+        var registerRequest = RegisterUserRequestDto("test@default.com", "456", Role.DEFAULT)
 
         //when
-        var resultActions = mockMvc.perform(post("/user/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(registerRequest))
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            post("/user/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -109,16 +115,18 @@ class UserControllerTest {
     @Transactional
     @DisplayName("회원가입-어드민-정상")
     @Throws(Exception::class)
-    fun registerAdminSuccess(){
+    fun registerAdminSuccess() {
 
         //give
-        var registerRequest = RegisterUserRequestDto("test@default.com","456",Role.ADMIN)
+        var registerRequest = RegisterUserRequestDto("test@default.com", "456", Role.ADMIN)
 
         //when
-        var resultActions = mockMvc.perform(post("/user/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(registerRequest))
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            post("/user/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -132,16 +140,18 @@ class UserControllerTest {
     @Transactional
     @DisplayName("회원가입-실패-이메일누락")
     @Throws(Exception::class)
-    fun registerFailNullEmail(){
+    fun registerFailNullEmail() {
 
         //give
-        var registerRequest = RegisterUserRequestDto(null,"123",Role.DEFAULT)
+        var registerRequest = RegisterUserRequestDto(null, "123", Role.DEFAULT)
 
         //when
-        var resultActions = mockMvc.perform(post("/user/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(registerRequest))
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            post("/user/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -155,16 +165,18 @@ class UserControllerTest {
     @Transactional
     @DisplayName("회원가입-실패-잘못된이메일형식")
     @Throws(Exception::class)
-    fun registerFailWrongEmailForm(){
+    fun registerFailWrongEmailForm() {
 
         //give
-        var registerRequest = RegisterUserRequestDto("asd","123",Role.DEFAULT)
+        var registerRequest = RegisterUserRequestDto("asd", "123", Role.DEFAULT)
 
         //when
-        var resultActions = mockMvc.perform(post("/user/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(registerRequest))
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            post("/user/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -178,16 +190,18 @@ class UserControllerTest {
     @Transactional
     @DisplayName("회원가입-실패-비밀번호 누락")
     @Throws(Exception::class)
-    fun registerFailNullPassword(){
+    fun registerFailNullPassword() {
 
         //give
-        var registerRequest = RegisterUserRequestDto("test@email.com",null,Role.DEFAULT)
+        var registerRequest = RegisterUserRequestDto("test@email.com", null, Role.DEFAULT)
 
         //when
-        var resultActions = mockMvc.perform(post("/user/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(registerRequest))
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            post("/user/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -201,16 +215,18 @@ class UserControllerTest {
     @Transactional
     @DisplayName("회원가입-실패-역할 누락")
     @Throws(Exception::class)
-    fun registerFailNullRole(){
+    fun registerFailNullRole() {
 
         //give
-        var registerRequest = RegisterUserRequestDto("test@email.com","123",null)
+        var registerRequest = RegisterUserRequestDto("test@email.com", "123", null)
 
         //when
-        var resultActions = mockMvc.perform(post("/user/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(registerRequest))
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            post("/user/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -224,16 +240,18 @@ class UserControllerTest {
     @Transactional
     @DisplayName("회원가입-실패-최상위관리자 요청")
     @Throws(Exception::class)
-    fun registerFailWrongRole(){
+    fun registerFailWrongRole() {
 
         //give
-        var registerRequest = RegisterUserRequestDto("test@email.com","123",Role.SUPERIOR_ADMIN)
+        var registerRequest = RegisterUserRequestDto("test@email.com", "123", Role.SUPERIOR_ADMIN)
 
         //when
-        var resultActions = mockMvc.perform(post("/user/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(registerRequest))
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            post("/user/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -247,16 +265,18 @@ class UserControllerTest {
     @Transactional
     @DisplayName("회원가입-실패-존재하는 이메일")
     @Throws(Exception::class)
-    fun registerFailDubEmail(){
+    fun registerFailDubEmail() {
 
         //give
-        var registerUserRequestDto = RegisterUserRequestDto("default@email.com","123",Role.DEFAULT)
+        var registerUserRequestDto = RegisterUserRequestDto("default@email.com", "123", Role.DEFAULT)
 
         //when
-        var resultActions = mockMvc.perform(post("/user/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(registerUserRequestDto))
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            post("/user/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerUserRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -266,20 +286,30 @@ class UserControllerTest {
             .andExpect(jsonPath("email").value(null))
     }
 
+    /*
+    여기까지 회원가입 로직 관련
+    */
+
+    /*
+    여기부터 로그인 로직 관련
+    */
+
     @Test
     @Transactional
     @DisplayName("로그인-실패-잘못된 이메일")
     @Throws(Exception::class)
-    fun registerFailWrongEmail(){
+    fun registerFailWrongEmail() {
 
         //give
-        var loginRequestDto = LoginRequestDto("no@email.com","123")
+        var loginRequestDto = LoginRequestDto("no@email.com", "123")
 
         //when
-        var resultActions = mockMvc.perform(post("/user/login")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(loginRequestDto))
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            post("/user/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -293,16 +323,18 @@ class UserControllerTest {
     @Transactional
     @DisplayName("로그인-실패-잘못된 비밀번호")
     @Throws(Exception::class)
-    fun registerFailWrongPassword(){
+    fun registerFailWrongPassword() {
 
         //give
-        var loginRequestDto = LoginRequestDto("default@email.com","456")
+        var loginRequestDto = LoginRequestDto("default@email.com", "456")
 
         //when
-        var resultActions = mockMvc.perform(post("/user/login")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(loginRequestDto))
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            post("/user/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -312,16 +344,28 @@ class UserControllerTest {
             .andExpect(jsonPath("token").isEmpty)
     }
 
+    /*
+    여기까지 로그인 로직 관련
+    */
+
+    /*
+    여기부터 관리자 가입 신청 조회 로직 관련
+    */
+
+
+
     @Test
     @Transactional
     @DisplayName("운영자 가입 신청 조회-성공-최상위관리자")
     @Throws(Exception::class)
-    fun viewRegisterSuperiorAdminRequestSuccess(){
+    fun viewRegisterSuperiorAdminRequestSuccess() {
 
         //when
-        var resultActions = mockMvc.perform(get("/user/register-admin-request-list")
-            .header("Authorization",superiorAdminToken)
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            get("/user/register-admin-request-list")
+                .header("Authorization", superiorAdminToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -335,12 +379,14 @@ class UserControllerTest {
     @Transactional
     @DisplayName("운영자 가입 신청 조회-실패-권한부족")
     @Throws(Exception::class)
-    fun viewRegisterAdminRequestFailLackAuthority(){
+    fun viewRegisterAdminRequestFailLackAuthority() {
 
         //when
-        var resultActions = mockMvc.perform(get("/user/register-admin-request-list")
-            .header("Authorization",businessToken)
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            get("/user/register-admin-request-list")
+                .header("Authorization", businessToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -350,24 +396,35 @@ class UserControllerTest {
             .andExpect(jsonPath("simpleRequestList").isEmpty)
     }
 
+    /*
+    여기까지 관리자 가입 신청 조회 로직 관련
+    */
+
+    /*
+    여기부터 관리자 가입 신청 수락 로직 관련
+    */
 
     @Test
     @Transactional
     @DisplayName("운영자 가입 신청 수락 - 성공")
     @Throws(Exception::class)
-    fun registerAdminAcceptSuccess(){
+    fun registerAdminAcceptSuccess() {
         //given
-        var registerRequest = RegisterUserRequestDto("test@default.com","456",Role.ADMIN)
-        mockMvc.perform(post("/user/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(registerRequest))
-            .accept(MediaType.APPLICATION_JSON))
+        var registerRequest = RegisterUserRequestDto("test@default.com", "456", Role.ADMIN)
+        mockMvc.perform(
+            post("/user/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest))
+                .accept(MediaType.APPLICATION_JSON)
+        )
         var id = adminUserRequestRepository.findByEmail("test@default.com")!!.id
 
         //when
-        var resultActions = mockMvc.perform(get("/user/accept-admin-request/$id")
-            .header("Authorization",superiorAdminToken)
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            get("/user/accept-admin-request/$id")
+                .header("Authorization", superiorAdminToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -381,12 +438,14 @@ class UserControllerTest {
     @Transactional
     @DisplayName("운영자 가입 신청 수락 - 실패 - 잘못된 ID")
     @Throws(Exception::class)
-    fun registerAdminAcceptFailWrongId(){
-        var id:Long = 99999999L
+    fun registerAdminAcceptFailWrongId() {
+        var id: Long = 99999999L
         //when
-        var resultActions = mockMvc.perform(get("/user/accept-admin-request/$id")
-            .header("Authorization",superiorAdminToken)
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            get("/user/accept-admin-request/$id")
+                .header("Authorization", superiorAdminToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -400,19 +459,23 @@ class UserControllerTest {
     @Transactional
     @DisplayName("운영자 가입 신청 수락 - 실패 - 권한 부족")
     @Throws(Exception::class)
-    fun registerAdminAcceptFailLackAuthority(){
+    fun registerAdminAcceptFailLackAuthority() {
         //given
-        var registerRequest = RegisterUserRequestDto("test@default.com","456",Role.ADMIN)
-        mockMvc.perform(post("/user/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(registerRequest))
-            .accept(MediaType.APPLICATION_JSON))
+        var registerRequest = RegisterUserRequestDto("test@default.com", "456", Role.ADMIN)
+        mockMvc.perform(
+            post("/user/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest))
+                .accept(MediaType.APPLICATION_JSON)
+        )
         var id = adminUserRequestRepository.findByEmail("test@default.com")!!.id
 
         //when
-        var resultActions = mockMvc.perform(get("/user/accept-admin-request/$id")
-            .header("Authorization",adminToken)
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            get("/user/accept-admin-request/$id")
+                .header("Authorization", adminToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -422,24 +485,36 @@ class UserControllerTest {
             .andExpect(jsonPath("simpleRegisterAdminRequest").isEmpty)
     }
 
+    /*
+    여기까지 관리자 가입 신청 수락 로직 관련
+    */
+
+    /*
+    여기부터 관리자 가입 신청 거절 로직 관련
+    */
+
 
     @Test
     @Transactional
     @DisplayName("운영자 가입 신청 거절 - 성공")
     @Throws(Exception::class)
-    fun registerAdminDenySuccess(){
+    fun registerAdminDenySuccess() {
         //given
-        var registerRequest = RegisterUserRequestDto("test@default.com","456",Role.ADMIN)
-        mockMvc.perform(post("/user/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(registerRequest))
-            .accept(MediaType.APPLICATION_JSON))
+        var registerRequest = RegisterUserRequestDto("test@default.com", "456", Role.ADMIN)
+        mockMvc.perform(
+            post("/user/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest))
+                .accept(MediaType.APPLICATION_JSON)
+        )
         var id = adminUserRequestRepository.findByEmail("test@default.com")!!.id
 
         //when
-        var resultActions = mockMvc.perform(get("/user/deny-admin-request/$id")
-            .header("Authorization",superiorAdminToken)
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            get("/user/deny-admin-request/$id")
+                .header("Authorization", superiorAdminToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -453,12 +528,14 @@ class UserControllerTest {
     @Transactional
     @DisplayName("운영자 가입 신청 거절- 실패 - 잘못된 ID")
     @Throws(Exception::class)
-    fun registerAdminDenyFailWrongId(){
-        var id:Long = 999999999L
+    fun registerAdminDenyFailWrongId() {
+        var id: Long = 999999999L
         //when
-        var resultActions = mockMvc.perform(get("/user/deny-admin-request/$id")
-            .header("Authorization",superiorAdminToken)
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            get("/user/deny-admin-request/$id")
+                .header("Authorization", superiorAdminToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -472,19 +549,23 @@ class UserControllerTest {
     @Transactional
     @DisplayName("운영자 가입 신청 거절 - 실패 - 권한 부족")
     @Throws(Exception::class)
-    fun registerAdminDenyFailLackAuthority(){
+    fun registerAdminDenyFailLackAuthority() {
         //given
-        var registerRequest = RegisterUserRequestDto("test@default.com","456",Role.ADMIN)
-        mockMvc.perform(post("/user/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(registerRequest))
-            .accept(MediaType.APPLICATION_JSON))
+        var registerRequest = RegisterUserRequestDto("test@default.com", "456", Role.ADMIN)
+        mockMvc.perform(
+            post("/user/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest))
+                .accept(MediaType.APPLICATION_JSON)
+        )
         var id = adminUserRequestRepository.findByEmail("test@default.com")!!.id
 
         //when
-        var resultActions = mockMvc.perform(get("/user/deny-admin-request/$id")
-            .header("Authorization",adminToken)
-            .accept(MediaType.APPLICATION_JSON)).andDo(print())
+        var resultActions = mockMvc.perform(
+            get("/user/deny-admin-request/$id")
+                .header("Authorization", adminToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print())
 
         //then
         resultActions
@@ -493,5 +574,9 @@ class UserControllerTest {
             .andExpect(jsonPath("msg").value("권한이 부족합니다."))
             .andExpect(jsonPath("simpleRegisterAdminRequest").isEmpty)
     }
+
+    /*
+    여기까지 관리자 가입 신청 거절 로직 관련
+    */
 
 }
