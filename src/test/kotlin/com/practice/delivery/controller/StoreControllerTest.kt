@@ -1,13 +1,15 @@
 package com.practice.delivery.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.practice.delivery.dto.request.AddMenuRequestDto
 import com.practice.delivery.dto.request.RegisterStoreRequestDto
-import com.practice.delivery.dto.request.RegisterUserRequestDto
 import com.practice.delivery.entity.Role
+import com.practice.delivery.entity.Store
 import com.practice.delivery.entity.StoreRegisterRequest
 import com.practice.delivery.entity.User
 import com.practice.delivery.jwt.JwtTokenProvider
 import com.practice.delivery.repository.StoreRegisterRequestRepository
+import com.practice.delivery.repository.StoreRepository
 import com.practice.delivery.repository.UserRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -46,17 +48,21 @@ class StoreControllerTest {
     @Autowired
     lateinit var storeRegisterRequestRepository: StoreRegisterRequestRepository
 
+    @Autowired
+    lateinit var storeRepository: StoreRepository
+
     var defaultToken = ""
     var businessToken = ""
     var adminToken = ""
     var superiorAdminToken = ""
 
+    var defaultUser = User()
+    var businessUser = User()
+    var adminUser = User()
+    var superiorAdminUser = User()
+
     @BeforeEach
     fun setup() {
-        var defaultUser = User()
-        var businessUser = User()
-        var adminUser = User()
-        var superiorAdminUser = User()
         defaultUser.email = "default@email.com"
         businessUser.email = "business@email.com"
         adminUser.email = "admin@email.com"
@@ -442,8 +448,41 @@ class StoreControllerTest {
     }
 
     /*
-    여기부터 가게 등록 신청 거절 로직 관련
+    여기까지 가게 등록 신청 거절 로직 관련
     */
+
+    /*
+    여기부터 메뉴 추가 로직 관련
+    */
+
+    @Test
+    @Transactional
+    @DisplayName("메뉴 추가-성공-추가메뉴없음")
+    @Throws(Exception::class)
+    fun addMenuSuccess() {
+        var store = Store()
+        store.storeName = "testStoreName"
+        store.owner = businessUser
+        storeRepository.save(store)
+        var addMenuRequestDto =
+            AddMenuRequestDto("testMenuName", "testMenuDesc", 3000, "http://testimg.com/img.png", false, null)
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.post("/store/add-menu")
+                .header("Authorization", businessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(addMenuRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("성공적으로 메뉴를 추가하였습니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleMenu").hasJsonPath())
+    }
 
 
 }
