@@ -10,6 +10,7 @@ import com.practice.delivery.service.StoreService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -37,12 +38,12 @@ class StoreController(private var storeService: StoreService) {
 
 
     @GetMapping("/accept-register-request/{id}")
-    fun acceptRegisterStore(@AuthenticationPrincipal userDetails: UserDetailsImpl,id:Long):ManageRegisterStoreResponseDto{
+    fun acceptRegisterStore(@AuthenticationPrincipal userDetails: UserDetailsImpl,@PathVariable id:Long):ManageRegisterStoreResponseDto{
         return storeService.acceptRegisterStoreRequest(userDetails, id)
     }
 
     @GetMapping("/deny-register-request/{id}")
-    fun denyRegisterStore(@AuthenticationPrincipal userDetails: UserDetailsImpl,id:Long):ManageRegisterStoreResponseDto{
+    fun denyRegisterStore(@AuthenticationPrincipal userDetails: UserDetailsImpl,@PathVariable id:Long):ManageRegisterStoreResponseDto{
         return storeService.denyRegisterStoreRequest(userDetails, id)
     }
 }
