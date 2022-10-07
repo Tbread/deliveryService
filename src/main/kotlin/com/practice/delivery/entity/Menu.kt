@@ -25,7 +25,7 @@ class Menu {
     var thisHasOption:Boolean = false
 
     @Column(nullable = false)
-    var ThisIsOption:Boolean = false
+    var thisIsOption:Boolean = false
 
     @Column(nullable = false)
     var thisIsSoldOut:Boolean = false

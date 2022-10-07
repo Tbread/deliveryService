@@ -2,10 +2,7 @@ package com.practice.delivery.controller
 
 import com.practice.delivery.dto.request.AddMenuRequestDto
 import com.practice.delivery.dto.request.RegisterStoreRequestDto
-import com.practice.delivery.dto.response.AddMenuResponseDto
-import com.practice.delivery.dto.response.ManageRegisterStoreResponseDto
-import com.practice.delivery.dto.response.RegisterStoreResponseDto
-import com.practice.delivery.dto.response.ViewRegisterStoreRequestListResponseDto
+import com.practice.delivery.dto.response.*
 
 import com.practice.delivery.service.implemented.UserDetailsImpl
 import com.practice.delivery.service.MenuService
@@ -63,5 +60,10 @@ class StoreController(private var storeService: StoreService, private var menuSe
         bindingResult: BindingResult
     ): AddMenuResponseDto {
         return menuService.addMenu(userDetails, req, bindingResult)
+    }
+
+    @GetMapping("/show-menu-list/{id}")
+    fun showMenuList(@PathVariable id:Long):ShowMenuResponseDto{
+        return menuService.showMenuList(id)
     }
 }

@@ -2,6 +2,7 @@ package com.practice.delivery.service
 
 import com.practice.delivery.dto.request.AddMenuRequestDto
 import com.practice.delivery.dto.response.AddMenuResponseDto
+import com.practice.delivery.dto.response.ShowMenuResponseDto
 import com.practice.delivery.service.implemented.UserDetailsImpl
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
@@ -9,4 +10,6 @@ import org.springframework.validation.BindingResult
 interface MenuService {
 
     fun addMenu(@AuthenticationPrincipal userDetails: UserDetailsImpl, req:AddMenuRequestDto, bindingResult: BindingResult):AddMenuResponseDto
+
+    fun showMenuList(id:Long):ShowMenuResponseDto
 }
