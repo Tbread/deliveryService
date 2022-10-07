@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.practice.delivery.dto.request.RegisterStoreRequestDto
 import com.practice.delivery.dto.request.RegisterUserRequestDto
 import com.practice.delivery.entity.Role
+import com.practice.delivery.entity.StoreRegisterRequest
 import com.practice.delivery.entity.User
 import com.practice.delivery.jwt.JwtTokenProvider
+import com.practice.delivery.repository.StoreRegisterRequestRepository
 import com.practice.delivery.repository.UserRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -40,6 +42,9 @@ class StoreControllerTest {
 
     @Autowired
     lateinit var userRepository: UserRepository
+
+    @Autowired
+    lateinit var storeRegisterRequestRepository: StoreRegisterRequestRepository
 
     var defaultToken = ""
     var businessToken = ""
@@ -134,7 +139,7 @@ class StoreControllerTest {
     fun registerStoreFailNullStoreName() {
 
         //give
-        var registerRequest = RegisterStoreRequestDto(null,"","",0)
+        var registerRequest = RegisterStoreRequestDto(null, "", "", 0)
 
         //when
         var resultActions = mockMvc.perform(
@@ -160,7 +165,7 @@ class StoreControllerTest {
     fun registerStoreFailDubApply() {
 
         //give
-        var registerRequest = RegisterStoreRequestDto("testName","","",0)
+        var registerRequest = RegisterStoreRequestDto("testName", "", "", 0)
         mockMvc.perform(
             MockMvcRequestBuilders.post("/store/register")
                 .header("Authorization", businessToken)
@@ -186,6 +191,227 @@ class StoreControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("storeName").isEmpty)
     }
 
+
+    @Test
+    @Transactional
+    @DisplayName("가게 등록 신청 조회-성공-최상위관리자")
+    @Throws(Exception::class)
+    fun viewRegisterStoreRequestSuccessSuperiorAdmin() {
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.get("/store/register-store-request-list")
+                .header("Authorization", superiorAdminToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("성공적으로 불러왔습니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleRequestList").isArray)
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("가게 등록 신청 조회-성공-일반관리자")
+    @Throws(Exception::class)
+    fun viewRegisterStoreRequestSuccessAdmin() {
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.get("/store/register-store-request-list")
+                .header("Authorization", adminToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("성공적으로 불러왔습니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleRequestList").isArray)
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("가게 등록 신청 조회-실패-권한부족")
+    @Throws(Exception::class)
+    fun viewRegisterStoreRequestFailLackAuthority() {
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.get("/store/register-store-request-list")
+                .header("Authorization", businessToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(403))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("권한이 부족합니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleRequestList").isEmpty)
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("가게 등록 신청 수락-성공")
+    @Throws(Exception::class)
+    fun acceptRegisterStoreSuccess() {
+        var storeRegisterRequest = StoreRegisterRequest()
+        storeRegisterRequest.storeName = "testName"
+        storeRegisterRequest.storeDesc = "testDesc"
+        storeRegisterRequest.storeImgSrc = "testSrc"
+        storeRegisterRequest.status = StoreRegisterRequest.Status.AWAIT
+        storeRegisterRequest.owner = userRepository.findByEmail("business@email.com")
+        storeRegisterRequestRepository.save(storeRegisterRequest)
+        var id = storeRegisterRequest.id
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.get("/store/accept-register-request/$id")
+                .header("Authorization", adminToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("성공적으로 수락하였습니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleRegisterStoreRequest").hasJsonPath())
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("가게 등록 신청 수락-실패-권한 부족")
+    @Throws(Exception::class)
+    fun acceptRegisterStoreFailLackAuthority() {
+        var storeRegisterRequest = StoreRegisterRequest()
+        storeRegisterRequest.storeName = "testName"
+        storeRegisterRequest.storeDesc = "testDesc"
+        storeRegisterRequest.storeImgSrc = "testSrc"
+        storeRegisterRequest.status = StoreRegisterRequest.Status.AWAIT
+        storeRegisterRequest.owner = userRepository.findByEmail("business@email.com")
+        storeRegisterRequestRepository.save(storeRegisterRequest)
+        var id = storeRegisterRequest.id
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.get("/store/accept-register-request/$id")
+                .header("Authorization", defaultToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(403))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("권한이 부족합니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleRegisterStoreRequest").isEmpty)
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("가게 등록 신청 수락-실패-잘못된ID")
+    @Throws(Exception::class)
+    fun acceptRegisterStoreFailWrongId() {
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.get("/store/accept-register-request/93542")
+                .header("Authorization", superiorAdminToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(400))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("존재하지 않는 요청 ID입니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleRegisterStoreRequest").isEmpty)
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("가게 등록 신청 거절-성공")
+    @Throws(Exception::class)
+    fun denyRegisterStoreSuccess() {
+        var storeRegisterRequest = StoreRegisterRequest()
+        storeRegisterRequest.storeName = "testName"
+        storeRegisterRequest.storeDesc = "testDesc"
+        storeRegisterRequest.storeImgSrc = "testSrc"
+        storeRegisterRequest.status = StoreRegisterRequest.Status.AWAIT
+        storeRegisterRequest.owner = userRepository.findByEmail("business@email.com")
+        storeRegisterRequestRepository.save(storeRegisterRequest)
+        var id = storeRegisterRequest.id
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.get("/store/deny-register-request/$id")
+                .header("Authorization", adminToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("성공적으로 거절하였습니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleRegisterStoreRequest").hasJsonPath())
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("가게 등록 신청 거절-실패-권한 부족")
+    @Throws(Exception::class)
+    fun denyRegisterStoreFailLackAuthority() {
+        var storeRegisterRequest = StoreRegisterRequest()
+        storeRegisterRequest.storeName = "testName"
+        storeRegisterRequest.storeDesc = "testDesc"
+        storeRegisterRequest.storeImgSrc = "testSrc"
+        storeRegisterRequest.status = StoreRegisterRequest.Status.AWAIT
+        storeRegisterRequest.owner = userRepository.findByEmail("business@email.com")
+        storeRegisterRequestRepository.save(storeRegisterRequest)
+        var id = storeRegisterRequest.id
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.get("/store/deny-register-request/$id")
+                .header("Authorization", defaultToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(403))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("권한이 부족합니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleRegisterStoreRequest").isEmpty)
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("가게 등록 신청 거절-실패-잘못된ID")
+    @Throws(Exception::class)
+    fun denyRegisterStoreFailWrongId() {
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.get("/store/accept-register-request/93542")
+                .header("Authorization", superiorAdminToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(400))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("존재하지 않는 요청 ID입니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleRegisterStoreRequest").isEmpty)
+    }
 
 
 }
