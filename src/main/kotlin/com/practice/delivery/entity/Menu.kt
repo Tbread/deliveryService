@@ -22,17 +22,21 @@ class Menu {
     var imgSrc:String? = null
 
     @Column(nullable = false)
-    var hasOption:Boolean = false
+    var thisHasOption:Boolean = false
 
     @Column(nullable = false)
-    var isOption:Boolean = false
+    var ThisIsOption:Boolean = false
 
     @Column(nullable = false)
-    var isSoldOut:Boolean = false
+    var thisIsSoldOut:Boolean = false
+
+    @ManyToOne
+    @JoinColumn
+    var store:Store? = null
 
 
     fun updateSoldOut(boolean: Boolean){
-        this.isSoldOut = boolean
+        this.thisIsSoldOut = boolean
     }
 
     fun updateImgSrc(imgSrc:String){
