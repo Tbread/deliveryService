@@ -646,5 +646,38 @@ class StoreControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("simpleMenu").hasJsonPath())
     }
 
+    @Test
+    @Transactional
+    @DisplayName("메뉴 추가-실패-옵션 여부 누락")
+    @Throws(Exception::class)
+    fun addMenuFailNullHasOption() {
+        var store = Store()
+        store.storeName = "testStoreName"
+        store.owner = userRepository.findByEmail("business@email.com")
+        storeRepository.save(store)
+        var optionMenuList = arrayListOf<OptionMenu>()
+        optionMenuList.add(OptionMenu("optionMenu1",100))
+        optionMenuList.add(OptionMenu("optionMenu2",500))
+        optionMenuList.add(OptionMenu("optionMenu3",1300))
+        var addMenuRequestDto =
+            AddMenuRequestDto("testMenuName", "testMenuDesc", 15000, "http://testimg.com/img.png", null, optionMenuList)
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.post("/store/add-menu")
+                .header("Authorization", businessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(addMenuRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(400))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("옵션여부는 필수 값입니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleMenu").hasJsonPath())
+    }
+
 
 }
