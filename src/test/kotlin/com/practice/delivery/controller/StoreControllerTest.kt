@@ -679,5 +679,77 @@ class StoreControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("simpleMenu").hasJsonPath())
     }
 
+    /*
+    여기까지 메뉴 추가 로직 관련
+    */
+
+    /*
+    여기부터 메뉴 조회 로직 관련
+    */
+
+    @Test
+    @Transactional
+    @DisplayName("메뉴 조회-성공")
+    @Throws(Exception::class)
+    fun showMenuListSuccess() {
+        var store = Store()
+        store.storeName = "testStoreName"
+        store.owner = userRepository.findByEmail("business@email.com")
+        storeRepository.save(store)
+        var optionMenuList = arrayListOf<OptionMenu>()
+        optionMenuList.add(OptionMenu("optionMenu1",100))
+        optionMenuList.add(OptionMenu("optionMenu2",500))
+        optionMenuList.add(OptionMenu("optionMenu3",1300))
+        var addMenuRequestDto =
+            AddMenuRequestDto("testMenuName", "testMenuDesc", 15000, "http://testimg.com/img.png", true, optionMenuList)
+        mockMvc.perform(
+            MockMvcRequestBuilders.post("/store/add-menu")
+                .header("Authorization", businessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(addMenuRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+        )
+        var id = store.id
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.get("/store/show-menu-list/$id")
+                .header("Authorization", businessToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("성공적으로 불러왔습니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleMenuList").isArray)
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("메뉴 조회-실패-잘못된 가게 ID")
+    @Throws(Exception::class)
+    fun showMenuListFailWrongStoreId() {
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.get("/store/show-menu-list/894328568")
+                .header("Authorization", businessToken)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(400))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("존재하지 않는 가게 ID입니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleMenuList").isEmpty)
+    }
+
+    /*
+    여기까지 메뉴 조회 로직 관련
+    */
+
 
 }
