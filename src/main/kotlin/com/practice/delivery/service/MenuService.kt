@@ -1,7 +1,7 @@
 package com.practice.delivery.service
 
 import com.practice.delivery.dto.request.AddMenuRequestDto
-import com.practice.delivery.dto.request.updateMenuRequestDto
+import com.practice.delivery.dto.request.UpdateMenuRequestDto
 import com.practice.delivery.dto.response.AddMenuResponseDto
 import com.practice.delivery.dto.response.DefaultResponseDto
 import com.practice.delivery.dto.response.ShowMenuResponseDto
@@ -17,5 +17,5 @@ interface MenuService {
 
     fun removeMenu(@AuthenticationPrincipal userDetails: UserDetailsImpl,id:Long):DefaultResponseDto
 
-    fun updateMenu(@AuthenticationPrincipal userDetails: UserDetailsImpl,req:updateMenuRequestDto):DefaultResponseDto
+    fun updateMenu(@AuthenticationPrincipal userDetails: UserDetailsImpl, req:UpdateMenuRequestDto, id:Long,bindingResult: BindingResult):DefaultResponseDto
 }

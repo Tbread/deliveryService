@@ -1,7 +1,7 @@
 package com.practice.delivery.service.implemented
 
 import com.practice.delivery.dto.request.AddMenuRequestDto
-import com.practice.delivery.dto.request.updateMenuRequestDto
+import com.practice.delivery.dto.request.UpdateMenuRequestDto
 import com.practice.delivery.dto.response.AddMenuResponseDto
 import com.practice.delivery.dto.response.DefaultResponseDto
 import com.practice.delivery.dto.response.ShowMenuResponseDto
@@ -115,7 +115,7 @@ class MenuServiceImpl(
             res.msg = "권한이 부족합니다."
         } else {
             var selectedMenu = menuRepository.findById(id)
-            if (Objects.isNull(selectedMenu.get())){
+            if (!menuRepository.existsById(id)){
                 res.code = HttpServletResponse.SC_BAD_REQUEST
                 res.msg = "존재하지 않는 메뉴 ID입니다."
             } else {
@@ -155,7 +155,46 @@ class MenuServiceImpl(
     }
 
     @Transactional
-    override fun updateMenu(userDetails: UserDetailsImpl, req: updateMenuRequestDto): DefaultResponseDto {
-        TODO("Not yet implemented")
+    override fun updateMenu(userDetails: UserDetailsImpl, req: UpdateMenuRequestDto, id:Long,bindingResult: BindingResult): DefaultResponseDto {
+        var res = DefaultResponseDto()
+        if ("BUSINESS" !in userDetails.getUser().getAuthorities()) {
+            res.code = HttpServletResponse.SC_FORBIDDEN
+            res.msg = "권한이 부족합니다."
+        } else {
+            if (bindingResult.hasErrors()) {
+                res.code = HttpServletResponse.SC_BAD_REQUEST
+                res.msg = bindingResult.allErrors[0].defaultMessage!!
+            } else {
+                if (!menuRepository.existsById(id)) {
+                    res.code = HttpServletResponse.SC_BAD_REQUEST
+                    res.msg = "존재하지 않는 메뉴 ID입니다."
+                } else {
+                    var menu = menuRepository.findById(id).get()
+                    if (menu.store!!.owner != userDetails.getUser()) {
+                        res.code = HttpServletResponse.SC_FORBIDDEN
+                        res.msg = "권한이 부족합니다."
+                    } else {
+                        if (Objects.nonNull(req.desc)) {
+                            menu.updateDesc(req.desc!!)
+                        }
+                        if (Objects.nonNull(req.imgSrc)) {
+                            menu.updateImgSrc(req.imgSrc!!)
+                        }
+                        if (Objects.nonNull(req.price)) {
+                            menu.updatePrice(req.price!!)
+                        }
+                        if (Objects.nonNull(req.menuName)) {
+                            menu.updateMenuName(req.menuName!!)
+                        }
+                        if (Objects.nonNull(req.soldOut)) {
+                            menu.updateSoldOut(req.soldOut!!)
+                        }
+                        res.code = HttpServletResponse.SC_OK
+                        res.msg = "성공적으로 변경하였습니다."
+                    }
+                }
+            }
+        }
+        return res
     }
 }

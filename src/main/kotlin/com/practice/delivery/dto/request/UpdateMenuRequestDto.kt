@@ -1,6 +1,6 @@
 package com.practice.delivery.dto.request
 
-data class updateMenuRequestDto (
+data class UpdateMenuRequestDto (
     val menuName:String?,
     val price:Int?,
     val soldOut:Boolean?,
