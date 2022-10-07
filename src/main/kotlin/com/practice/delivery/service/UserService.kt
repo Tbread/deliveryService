@@ -17,9 +17,9 @@ interface UserService {
 
     fun login(req:LoginRequestDto,bindingResult: BindingResult):LoginResponseDto
 
-    fun viewRegisterAdminList(userDetails:UserDetailsImpl):ViewRegisterAdminRequestListResponseDto
+    fun viewRegisterAdminList(userDetails: UserDetailsImpl):ViewRegisterAdminRequestListResponseDto
 
-    fun acceptRegisterAdmin(userDetails: UserDetailsImpl,id:Long): ManageRegisterAdminResponseDto
+    fun acceptRegisterAdmin(userDetails: UserDetailsImpl, id:Long): ManageRegisterAdminResponseDto
 
-    fun denyRegisterAdmin(userDetails: UserDetailsImpl,id:Long):ManageRegisterAdminResponseDto
+    fun denyRegisterAdmin(userDetails: UserDetailsImpl, id:Long):ManageRegisterAdminResponseDto
 }

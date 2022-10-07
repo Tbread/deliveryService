@@ -10,11 +10,11 @@ import org.springframework.validation.BindingResult
 
 interface StoreService {
 
-    fun registerStore(@AuthenticationPrincipal userDetails: UserDetailsImpl,req: RegisterStoreRequestDto,bindingResult: BindingResult):RegisterStoreResponseDto
+    fun registerStore(@AuthenticationPrincipal userDetails: UserDetailsImpl, req: RegisterStoreRequestDto, bindingResult: BindingResult):RegisterStoreResponseDto
 
     fun viewRegisterStoreRequestList(@AuthenticationPrincipal userDetails: UserDetailsImpl): ViewRegisterStoreRequestListResponseDto
 
-    fun acceptRegisterStoreRequest(@AuthenticationPrincipal userDetails: UserDetailsImpl,id:Long): ManageRegisterStoreResponseDto
+    fun acceptRegisterStoreRequest(@AuthenticationPrincipal userDetails: UserDetailsImpl, id:Long): ManageRegisterStoreResponseDto
 
-    fun denyRegisterStoreRequest(@AuthenticationPrincipal userDetails: UserDetailsImpl,id:Long):ManageRegisterStoreResponseDto
+    fun denyRegisterStoreRequest(@AuthenticationPrincipal userDetails: UserDetailsImpl, id:Long):ManageRegisterStoreResponseDto
 }

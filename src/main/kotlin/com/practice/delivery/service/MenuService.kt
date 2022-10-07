@@ -8,5 +8,5 @@ import org.springframework.validation.BindingResult
 
 interface MenuService {
 
-    fun addMenu(@AuthenticationPrincipal userDetails: UserDetailsImpl,req:AddMenuRequestDto,bindingResult: BindingResult):AddMenuResponseDto
+    fun addMenu(@AuthenticationPrincipal userDetails: UserDetailsImpl, req:AddMenuRequestDto, bindingResult: BindingResult):AddMenuResponseDto
 }

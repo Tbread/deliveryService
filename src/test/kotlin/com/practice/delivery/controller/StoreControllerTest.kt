@@ -8,9 +8,9 @@ import com.practice.delivery.entity.Store
 import com.practice.delivery.entity.StoreRegisterRequest
 import com.practice.delivery.entity.User
 import com.practice.delivery.jwt.JwtTokenProvider
-import com.practice.delivery.repository.StoreRegisterRequestRepository
-import com.practice.delivery.repository.StoreRepository
-import com.practice.delivery.repository.UserRepository
+import com.practice.delivery.model.OptionMenu
+import com.practice.delivery.repository.*
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -51,18 +51,23 @@ class StoreControllerTest {
     @Autowired
     lateinit var storeRepository: StoreRepository
 
+    @Autowired
+    lateinit var menuRepository: MenuRepository
+
+    @Autowired
+    lateinit var menuOptionRepository: MenuOptionRepository
+
     var defaultToken = ""
     var businessToken = ""
     var adminToken = ""
     var superiorAdminToken = ""
 
-    var defaultUser = User()
-    var businessUser = User()
-    var adminUser = User()
-    var superiorAdminUser = User()
-
     @BeforeEach
     fun setup() {
+        var defaultUser = User()
+        var businessUser = User()
+        var adminUser = User()
+        var superiorAdminUser = User()
         defaultUser.email = "default@email.com"
         businessUser.email = "business@email.com"
         adminUser.email = "admin@email.com"
@@ -462,7 +467,7 @@ class StoreControllerTest {
     fun addMenuSuccess() {
         var store = Store()
         store.storeName = "testStoreName"
-        store.owner = businessUser
+        store.owner = userRepository.findByEmail("business@email.com")
         storeRepository.save(store)
         var addMenuRequestDto =
             AddMenuRequestDto("testMenuName", "testMenuDesc", 3000, "http://testimg.com/img.png", false, null)
@@ -481,6 +486,163 @@ class StoreControllerTest {
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
             .andExpect(MockMvcResultMatchers.jsonPath("msg").value("성공적으로 메뉴를 추가하였습니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleMenu").hasJsonPath())
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("메뉴 추가-성공-추가메뉴있음")
+    @Throws(Exception::class)
+    fun addMenuSuccessExistOptionalMenu() {
+        var store = Store()
+        store.storeName = "testStoreName"
+        store.owner = userRepository.findByEmail("business@email.com")
+        storeRepository.save(store)
+        var optionMenuList = arrayListOf<OptionMenu>()
+        optionMenuList.add(OptionMenu("optionMenu1",100))
+        optionMenuList.add(OptionMenu("optionMenu2",500))
+        optionMenuList.add(OptionMenu("optionMenu3",1300))
+        var addMenuRequestDto =
+            AddMenuRequestDto("testMenuName", "testMenuDesc", 3000, "http://testimg.com/img.png", false, optionMenuList)
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.post("/store/add-menu")
+                .header("Authorization", businessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(addMenuRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("성공적으로 메뉴를 추가하였습니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleMenu").hasJsonPath())
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("메뉴 추가-실패-권한부족")
+    @Throws(Exception::class)
+    fun addMenuFailLackAuthority() {
+        var optionMenuList = arrayListOf<OptionMenu>()
+        optionMenuList.add(OptionMenu("optionMenu1",100))
+        optionMenuList.add(OptionMenu("optionMenu2",500))
+        optionMenuList.add(OptionMenu("optionMenu3",1300))
+        var addMenuRequestDto =
+            AddMenuRequestDto("testMenuName", "testMenuDesc", 3000, "http://testimg.com/img.png", false, optionMenuList)
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.post("/store/add-menu")
+                .header("Authorization", defaultToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(addMenuRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(403))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("권한이 부족합니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleMenu").hasJsonPath())
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("메뉴 추가-실패-소유중인 가게가 존재하지 않음")
+    @Throws(Exception::class)
+    fun addMenuFailNullStore() {
+        var optionMenuList = arrayListOf<OptionMenu>()
+        optionMenuList.add(OptionMenu("optionMenu1",100))
+        optionMenuList.add(OptionMenu("optionMenu2",500))
+        optionMenuList.add(OptionMenu("optionMenu3",1300))
+        var addMenuRequestDto =
+            AddMenuRequestDto("testMenuName", "testMenuDesc", 3000, "http://testimg.com/img.png", false, optionMenuList)
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.post("/store/add-menu")
+                .header("Authorization", businessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(addMenuRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(400))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("소유중인 가게가 존재하지 않습니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleMenu").hasJsonPath())
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("메뉴 추가-실패-메뉴이름 누락")
+    @Throws(Exception::class)
+    fun addMenuFailNullMenuName() {
+        var store = Store()
+        store.storeName = "testStoreName"
+        store.owner = userRepository.findByEmail("business@email.com")
+        storeRepository.save(store)
+        var optionMenuList = arrayListOf<OptionMenu>()
+        optionMenuList.add(OptionMenu("optionMenu1",100))
+        optionMenuList.add(OptionMenu("optionMenu2",500))
+        optionMenuList.add(OptionMenu("optionMenu3",1300))
+        var addMenuRequestDto =
+            AddMenuRequestDto(null, "testMenuDesc", 3000, "http://testimg.com/img.png", false, optionMenuList)
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.post("/store/add-menu")
+                .header("Authorization", businessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(addMenuRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(400))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("메뉴 이름은 필수 값입니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("simpleMenu").hasJsonPath())
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("메뉴 추가-실패-메뉴가격 누락")
+    @Throws(Exception::class)
+    fun addMenuFailNullMenuPrice() {
+        var store = Store()
+        store.storeName = "testStoreName"
+        store.owner = userRepository.findByEmail("business@email.com")
+        storeRepository.save(store)
+        var optionMenuList = arrayListOf<OptionMenu>()
+        optionMenuList.add(OptionMenu("optionMenu1",100))
+        optionMenuList.add(OptionMenu("optionMenu2",500))
+        optionMenuList.add(OptionMenu("optionMenu3",1300))
+        var addMenuRequestDto =
+            AddMenuRequestDto("testMenuName", "testMenuDesc", null, "http://testimg.com/img.png", false, optionMenuList)
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.post("/store/add-menu")
+                .header("Authorization", businessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(addMenuRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(400))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("메뉴 가격은 필수 값입니다."))
             .andExpect(MockMvcResultMatchers.jsonPath("simpleMenu").hasJsonPath())
     }
 

@@ -47,19 +47,19 @@ class MenuServiceImpl(
                         res.msg = bindingResult.allErrors[0].defaultMessage
                     } else {
                         var mainMenu = Menu()
-                        mainMenu.menuName = req.menuName
+                        mainMenu.menuName = req.menuName!!
                         mainMenu.desc = req.desc
                         mainMenu.imgSrc = req.imgSrc
-                        mainMenu.hasOption = req.hasOption
+                        mainMenu.hasOption = req.hasOption!!
                         mainMenu.isOption = false
-                        mainMenu.price = req.price
+                        mainMenu.price = req.price!!
                         menuRepository.save(mainMenu)
-                        if (mainMenu.hasOption){
+                        if (mainMenu.hasOption!!){
                             for (subMenuRequest:OptionMenu in req.optionMenuList!!){
                                 var subMenu = Menu()
                                 var menuOption = MenuOption()
-                                subMenu.menuName = subMenuRequest.name
-                                subMenu.price = subMenuRequest.price
+                                subMenu.menuName = subMenuRequest.name!!
+                                subMenu.price = subMenuRequest.price!!
                                 subMenu.isOption = true
                                 menuRepository.save(subMenu)
                                 menuOption.topMenu = mainMenu
