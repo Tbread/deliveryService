@@ -46,13 +46,9 @@ class User : Timestamped() {
             Role.SUPERIOR_ADMIN -> {
                 authoritiesList.add(Role.SUPERIOR_ADMIN.toString())
                 authoritiesList.add(Role.ADMIN.toString())
-                authoritiesList.add(Role.BUSINESS.toString())
-                authoritiesList.add(Role.DEFAULT.toString())
             }
             Role.ADMIN -> {
                 authoritiesList.add(Role.ADMIN.toString())
-                authoritiesList.add(Role.BUSINESS.toString())
-                authoritiesList.add(Role.DEFAULT.toString())
             }
             Role.BUSINESS -> {
                 authoritiesList.add(Role.BUSINESS.toString())
