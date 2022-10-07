@@ -1,9 +1,15 @@
 package com.practice.delivery.service.Implement
 
 import com.practice.delivery.dto.request.RegisterStoreRequestDto
+import com.practice.delivery.dto.response.ManageRegisterAdminResponseDto
+import com.practice.delivery.dto.response.ManageRegisterStoreResponseDto
 import com.practice.delivery.dto.response.RegisterStoreResponseDto
 import com.practice.delivery.dto.response.ViewRegisterStoreRequestListResponseDto
+import com.practice.delivery.entity.Role
+import com.practice.delivery.entity.Store
 import com.practice.delivery.entity.StoreRegisterRequest
+import com.practice.delivery.entity.User
+import com.practice.delivery.model.SimpleRegisterAdminRequest
 import com.practice.delivery.model.SimpleRegisterStoreRequest
 import com.practice.delivery.repository.StoreRegisterRequestRepository
 import com.practice.delivery.repository.StoreRepository
@@ -71,17 +77,18 @@ class StoreServiceImpl(
 
     override fun viewRegisterStoreRequestList(userDetails: UserDetailsImpl): ViewRegisterStoreRequestListResponseDto {
         var res = ViewRegisterStoreRequestListResponseDto()
-        if (Objects.isNull(userDetails.getUser())){
+        if (Objects.isNull(userDetails.getUser())) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
         } else {
-            if("ADMIN" !in userDetails.getUser().getAuthorities()){
+            if ("ADMIN" !in userDetails.getUser().getAuthorities()) {
                 res.code = HttpServletResponse.SC_FORBIDDEN
                 res.msg = "권한이 부족합니다."
             } else {
-                var storeRegisterRequestList = storeRegisterRequestRepository.findByStatus(StoreRegisterRequest.Status.AWAIT)
+                var storeRegisterRequestList =
+                    storeRegisterRequestRepository.findByStatus(StoreRegisterRequest.Status.AWAIT)
                 var simpleRequestList = arrayListOf<SimpleRegisterStoreRequest>()
-                for (request in storeRegisterRequestList){
+                for (request in storeRegisterRequestList) {
                     var simpleRequest = SimpleRegisterStoreRequest(request)
                     simpleRequestList.add(simpleRequest)
                 }
@@ -94,12 +101,66 @@ class StoreServiceImpl(
     }
 
     @Transactional
-    override fun acceptRegisterStoreRequest(userDetails: UserDetailsImpl, id: Long): Any {
-        TODO("Not yet implemented")
+    override fun acceptRegisterStoreRequest(userDetails: UserDetailsImpl, id: Long): ManageRegisterStoreResponseDto {
+        var res = ManageRegisterStoreResponseDto()
+        if (Objects.isNull(userDetails.getUser())) {
+            res.code = HttpServletResponse.SC_FORBIDDEN
+            res.msg = "권한이 부족합니다."
+        } else {
+            if ("ADMIN" !in userDetails.getUser().getAuthorities()) {
+                res.code = HttpServletResponse.SC_FORBIDDEN
+                res.msg = "권한이 부족합니다."
+            } else {
+                var storeRequest = storeRegisterRequestRepository.findById(id)
+                if (!storeRegisterRequestRepository.existsById(id)) {
+                    res.code = HttpServletResponse.SC_BAD_REQUEST
+                    res.msg = "존재하지 않는 요청 ID입니다."
+                } else {
+                    var store = Store()
+                    store.storeName = storeRequest.get().storeName
+                    store.storeDesc = storeRequest.get().storeDesc
+                    store.storeImgSrc = storeRequest.get().storeImgSrc
+                    store.owner = storeRequest.get().owner
+                    if (Objects.isNull(storeRequest.get().minOrderPrice)) {
+                        store.minOrderPrice = 0
+                    } else {
+                        store.minOrderPrice = storeRequest.get().minOrderPrice
+                    }
+                    storeRepository.save(store)
+                    storeRequest.get().acceptRequest(userDetails.getUser())
+                    res.code = HttpServletResponse.SC_OK
+                    res.msg = "성공적으로 수락하였습니다."
+                    res.simpleRegisterStoreRequest = SimpleRegisterStoreRequest(storeRequest.get())
+                }
+            }
+        }
+        return res
     }
 
     @Transactional
-    override fun denyRegisterStoreRequest(userDetails: UserDetailsImpl, id: Long): Any {
-        TODO("Not yet implemented")
+    override fun denyRegisterStoreRequest(userDetails: UserDetailsImpl, id: Long): ManageRegisterStoreResponseDto {
+        var res = ManageRegisterStoreResponseDto()
+        if (Objects.isNull(userDetails.getUser())) {
+            res.code = HttpServletResponse.SC_FORBIDDEN
+            res.msg = "권한이 부족합니다."
+        } else {
+            if ("ADMIN" !in userDetails.getUser().getAuthorities()) {
+                res.code = HttpServletResponse.SC_FORBIDDEN
+                res.msg = "권한이 부족합니다."
+            } else {
+                var storeRequest = storeRegisterRequestRepository.findById(id)
+                if (!storeRegisterRequestRepository.existsById(id)) {
+                    res.code = HttpServletResponse.SC_BAD_REQUEST
+                    res.msg = "존재하지 않는 요청 ID입니다."
+                } else {
+                    storeRequest.get().denyRequest(userDetails.getUser())
+                    res.code = HttpServletResponse.SC_OK
+                    res.msg = "성공적으로 거절하였습니다."
+                    res.simpleRegisterStoreRequest = SimpleRegisterStoreRequest(storeRequest.get())
+                }
+            }
+        }
+        return res
     }
+
 }

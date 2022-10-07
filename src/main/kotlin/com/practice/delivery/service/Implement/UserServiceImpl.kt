@@ -3,7 +3,7 @@ package com.practice.delivery.service.Implement
 import com.practice.delivery.dto.request.LoginRequestDto
 import com.practice.delivery.dto.request.RegisterUserRequestDto
 import com.practice.delivery.dto.response.LoginResponseDto
-import com.practice.delivery.dto.response.ManageRegisterAdminRequestResponseDto
+import com.practice.delivery.dto.response.ManageRegisterAdminResponseDto
 import com.practice.delivery.dto.response.RegisterUserResponseDto
 import com.practice.delivery.dto.response.ViewRegisterAdminRequestListResponseDto
 import com.practice.delivery.entity.AdminUserRequest
@@ -140,8 +140,8 @@ class UserServiceImpl(
     }
 
     @Transactional
-    override fun acceptRegisterAdmin(userDetails: UserDetailsImpl, id: Long): ManageRegisterAdminRequestResponseDto {
-        var res = ManageRegisterAdminRequestResponseDto()
+    override fun acceptRegisterAdmin(userDetails: UserDetailsImpl, id: Long): ManageRegisterAdminResponseDto {
+        var res = ManageRegisterAdminResponseDto()
         if (Objects.isNull(userDetails.getUser())){
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
@@ -171,8 +171,8 @@ class UserServiceImpl(
     }
 
     @Transactional
-    override fun denyRegisterAdmin(userDetails: UserDetailsImpl, id: Long): ManageRegisterAdminRequestResponseDto {
-        var res = ManageRegisterAdminRequestResponseDto()
+    override fun denyRegisterAdmin(userDetails: UserDetailsImpl, id: Long): ManageRegisterAdminResponseDto {
+        var res = ManageRegisterAdminResponseDto()
         if (Objects.isNull(userDetails.getUser())){
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."

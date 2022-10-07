@@ -3,7 +3,7 @@ package com.practice.delivery.controller
 import com.practice.delivery.dto.request.LoginRequestDto
 import com.practice.delivery.dto.request.RegisterUserRequestDto
 import com.practice.delivery.dto.response.LoginResponseDto
-import com.practice.delivery.dto.response.ManageRegisterAdminRequestResponseDto
+import com.practice.delivery.dto.response.ManageRegisterAdminResponseDto
 import com.practice.delivery.dto.response.RegisterUserResponseDto
 import com.practice.delivery.dto.response.ViewRegisterAdminRequestListResponseDto
 import com.practice.delivery.entity.Role
@@ -51,12 +51,12 @@ class UserController(private var userService: UserService) {
     }
 
     @GetMapping("/accept-admin-request/{id}")
-    fun acceptRegisterAdmin(@AuthenticationPrincipal userDetails: UserDetailsImpl, @PathVariable id: Long): ManageRegisterAdminRequestResponseDto {
+    fun acceptRegisterAdmin(@AuthenticationPrincipal userDetails: UserDetailsImpl, @PathVariable id: Long): ManageRegisterAdminResponseDto {
         return userService.acceptRegisterAdmin(userDetails, id)
     }
 
     @GetMapping("/deny-admin-request/{id}")
-    fun denyRegisterAdmin(@AuthenticationPrincipal userDetails: UserDetailsImpl, @PathVariable id: Long): ManageRegisterAdminRequestResponseDto {
+    fun denyRegisterAdmin(@AuthenticationPrincipal userDetails: UserDetailsImpl, @PathVariable id: Long): ManageRegisterAdminResponseDto {
         return userService.denyRegisterAdmin(userDetails, id)
     }
 }
