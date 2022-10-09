@@ -39,7 +39,7 @@ class MasterCoupon {
     @Column(nullable = false)
     var quantity:Int = 0
 
-    constructor(discountRate:Int,discountPrice:Int,minSpend:Int,maxDiscount:Int,issuer:User,expiryDate:LocalDate,quantity:Int,expired:Boolean){
+    constructor(discountRate:Int,discountPrice:Int,minSpend:Int,maxDiscount:Int,issuer:User,expiryDate:LocalDate,quantity:Int){
         this.discountPrice = discountPrice
         this.discountRate = discountRate
         this.minSpend = minSpend

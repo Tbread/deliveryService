@@ -1,11 +1,12 @@
 package com.practice.delivery.entity
 
+import com.practice.delivery.utils.Timestamped
 import javax.persistence.Column
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 
-class Coupon {
+class Coupon:Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

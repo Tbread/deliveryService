@@ -1,10 +1,11 @@
 package com.practice.delivery.entity
 
+import com.practice.delivery.utils.Timestamped
 import javax.persistence.*
 
 
 @Entity
-class StoreRegisterRequest {
+class StoreRegisterRequest:Timestamped() {
 
     enum class Status{
         AWAIT,

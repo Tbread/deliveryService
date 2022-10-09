@@ -1,9 +1,10 @@
 package com.practice.delivery.entity
 
+import com.practice.delivery.utils.Timestamped
 import javax.persistence.*
 
 @Entity
-class Menu {
+class Menu:Timestamped() {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

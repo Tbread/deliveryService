@@ -1,5 +1,6 @@
 package com.practice.delivery.entity
 
+import com.practice.delivery.utils.Timestamped
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -9,7 +10,7 @@ import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 
 @Entity
-class Store {
+class Store:Timestamped() {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
