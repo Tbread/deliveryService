@@ -17,14 +17,14 @@ class OrderedMenu {
 
     @ManyToOne
     @JoinColumn
+    var order:Order? = null
+
+    @ManyToOne
+    @JoinColumn
     var menu:Menu? = null
 
     @Column(nullable = false)
     var quantity:Int = 0
 
-    constructor(menu: Menu,quantity:Int){
-        this.menu = menu
-        this.quantity = quantity
-    }
 
 }
