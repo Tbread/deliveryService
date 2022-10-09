@@ -1047,7 +1047,6 @@ class StoreControllerTest {
         menuOption.subMenu = subMenu
         menuOptionRepository.save(menuOption)
         var updateMenuRequestDto = UpdateMenuRequestDto("modifiedUpdateMenuName",null,null,null,null)
-        var id = menu.id
 
         //when
         var resultActions = mockMvc.perform(
@@ -1064,5 +1063,13 @@ class StoreControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("code").value(400))
             .andExpect(MockMvcResultMatchers.jsonPath("msg").value("존재하지 않는 메뉴 ID입니다."))
     }
+
+    /*
+    여기까지 메뉴 업데이트 로직 관련
+    */
+
+    /*
+    여기부터  로직 관련
+    */
 
 }
