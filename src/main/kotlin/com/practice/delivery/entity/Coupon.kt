@@ -2,10 +2,14 @@ package com.practice.delivery.entity
 
 import com.practice.delivery.utils.Timestamped
 import javax.persistence.Column
+import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
 
+@Entity
 class Coupon:Timestamped {
 
     @Id
@@ -15,7 +19,8 @@ class Coupon:Timestamped {
     @Column(nullable = false)
     var expired:Boolean = false
 
-    @Column(nullable = false)
+    @ManyToOne
+    @JoinColumn
     var masterCoupon:MasterCoupon? = null
 
     @Column(nullable = false)
