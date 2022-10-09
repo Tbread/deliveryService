@@ -26,10 +26,15 @@ class Coupon:Timestamped {
     @Column(nullable = false)
     var available:Boolean = true
 
-    constructor(masterCoupon:MasterCoupon){
+    @ManyToOne
+    @JoinColumn
+    var owner:User? = null
+
+    constructor(masterCoupon:MasterCoupon,user: User){
         this.masterCoupon = masterCoupon
         this.expired = false
         this.available = true
+        this.owner = user
     }
 
     fun expireCoupon(){
