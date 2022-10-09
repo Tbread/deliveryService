@@ -8,7 +8,7 @@ import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 
-class CouponMaster {
+class MasterCoupon {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +26,9 @@ class CouponMaster {
     @Column(nullable = false)
     var maxDiscount:Int = 0
 
+    @Column(nullable = false)
+    var expired:Boolean = false
+
     @ManyToOne
     @JoinColumn
     var issuer:User? = null
@@ -36,7 +39,7 @@ class CouponMaster {
     @Column(nullable = false)
     var quantity:Int = 0
 
-    constructor(discountRate:Int,discountPrice:Int,minSpend:Int,maxDiscount:Int,issuer:User,expiryDate:LocalDate,quantity:Int){
+    constructor(discountRate:Int,discountPrice:Int,minSpend:Int,maxDiscount:Int,issuer:User,expiryDate:LocalDate,quantity:Int,expired:Boolean){
         this.discountPrice = discountPrice
         this.discountRate = discountRate
         this.minSpend = minSpend
@@ -44,6 +47,11 @@ class CouponMaster {
         this.issuer = issuer
         this.expiryDate = expiryDate
         this.quantity = quantity
+        this.expired = false
+    }
+
+    fun expiringMasterCoupon(){
+        this.expired = true
     }
 
 

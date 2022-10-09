@@ -15,13 +15,13 @@ class Coupon {
     var expired:Boolean = false
 
     @Column(nullable = false)
-    var couponMaster:CouponMaster? = null
+    var masterCoupon:MasterCoupon? = null
 
     @Column(nullable = false)
     var available:Boolean = true
 
-    constructor(couponMaster: CouponMaster){
-        this.couponMaster = couponMaster
+    constructor(masterCoupon:MasterCoupon){
+        this.masterCoupon = masterCoupon
         this.expired = false
         this.available = true
     }
