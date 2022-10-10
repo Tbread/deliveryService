@@ -2,6 +2,7 @@ package com.practice.delivery.service.implemented
 
 import com.practice.delivery.dto.request.OrderRequestDto
 import com.practice.delivery.dto.response.DefaultResponseDto
+import com.practice.delivery.dto.response.ManageOrderResponseDto
 import com.practice.delivery.dto.response.ViewOrderListResponseDto
 import com.practice.delivery.entity.*
 import com.practice.delivery.model.SimpleOrder
@@ -126,7 +127,7 @@ class OrderServiceImpl(
                         } else {
                             //퍼센트할인형 쿠폰인경우
                             discounted = initialPrice * (coupon.masterCoupon!!.discountRate / 100)
-                            if ((discounted > coupon.masterCoupon!!.maxDiscount) && coupon.masterCoupon!!.maxDiscount != 0){
+                            if ((discounted > coupon.masterCoupon!!.maxDiscount) && coupon.masterCoupon!!.maxDiscount != 0) {
                                 //최대 할인 금액이 존재하고 최대 할인 금액을 초과한 할인인 경우
                                 discounted = coupon.masterCoupon!!.maxDiscount
                             }
@@ -138,7 +139,7 @@ class OrderServiceImpl(
                     order.usedCoupon = coupon
                     order.store = orderedMenuList[0].menu!!.store
                     orderRepository.save(order)
-                    for (orderedMenu in orderedMenuList){
+                    for (orderedMenu in orderedMenuList) {
                         orderedMenu.order = order
                         orderedMenuRepository.save(orderedMenu)
                     }
@@ -153,30 +154,26 @@ class OrderServiceImpl(
     override fun viewOrderList(userDetails: UserDetailsImpl): ViewOrderListResponseDto {
         //Dto 에서 status 를 받아서 해당 status 만 불러오도록 하는게 나을지도?
         var res = ViewOrderListResponseDto()
-        if ("BUSINESS" !in userDetails.getUser().getAuthorities()){
-            res.code = HttpServletResponse.SC_FORBIDDEN
-            res.msg = "권한이 부족합니다."
+        var simpleOrderList = arrayListOf<SimpleOrder>()
+        if ("BUSINESS" !in userDetails.getUser().getAuthorities()) {
+            //일반 유저 로직
+            var orderList = orderRepository.findByOrderer(userDetails.getUser())
+            for (order in orderList){
+                var simpleOrder = orderToSimpleOrder(order,false)
+                simpleOrderList.add(simpleOrder)
+            }
+            res.code = HttpServletResponse.SC_OK
+            res.msg = "성공적으로 불러왔습니다."
+            res.simpleOrderList = simpleOrderList
         } else {
-            if (!storeRepository.existsByOwner(userDetails.getUser())){
+            //비즈니스 유저 로직
+            if (!storeRepository.existsByOwner(userDetails.getUser())) {
                 res.code = HttpServletResponse.SC_BAD_REQUEST
                 res.msg = "소유중인 가게가 존재하지 않습니다."
             } else {
                 var orderList = orderRepository.findByStore(storeRepository.findByOwner(userDetails.getUser())!!)
-                var simpleOrderList = arrayListOf<SimpleOrder>()
-                for (order in orderList){
-                    var orderedMenuList = orderedMenuRepository.findByOrder(order)
-                    var menuNameList = arrayListOf<String>()
-                    var quantityList = arrayListOf<Int>()
-                    for (orderedMenu in orderedMenuList){
-                        menuNameList.add(orderedMenu.menu!!.menuName)
-                        quantityList.add(orderedMenu.quantity)
-                    }
-                    var simpleOrder = SimpleOrder()
-                    simpleOrder.orderId = order.id
-                    simpleOrder.menuNameList = menuNameList
-                    simpleOrder.quantityList = quantityList
-                    simpleOrder.status = order.status
-                    simpleOrder.priceSum = order.initialPrice
+                for (order in orderList) {
+                    var simpleOrder = orderToSimpleOrder(order, true)
                     simpleOrderList.add(simpleOrder)
                 }
                 res.code = HttpServletResponse.SC_OK
@@ -188,18 +185,117 @@ class OrderServiceImpl(
     }
 
     @Transactional
-    override fun acceptOrder(userDetails: UserDetailsImpl, id: Long): Any {
-        TODO("Not yet implemented")
+    override fun acceptOrder(userDetails: UserDetailsImpl, id: Long): ManageOrderResponseDto {
+        var res = ManageOrderResponseDto()
+        if ("BUSINESS" !in userDetails.getUser().getAuthorities()) {
+            res.code = HttpServletResponse.SC_FORBIDDEN
+            res.msg = "권한이 부족합니다."
+        } else {
+            if (!storeRepository.existsByOwner(userDetails.getUser())) {
+                res.code = HttpServletResponse.SC_BAD_REQUEST
+                res.msg = "소유중인 가게가 존재하지 않습니다."
+            } else {
+                if (!orderRepository.existsById(id)) {
+                    res.code = HttpServletResponse.SC_BAD_REQUEST
+                    res.msg = "존재하지 않는 주문 ID입니다."
+                } else {
+                    var order = orderRepository.findById(id).get()
+                    if (order.store!!.owner != userDetails.getUser()) {
+                        res.code = HttpServletResponse.SC_FORBIDDEN
+                        res.msg = "권한이 부족합니다."
+                    } else {
+                        order.updateStatus(Order.Status.COOKING)
+                        res.code = HttpServletResponse.SC_OK
+                        res.msg = "성공적으로 수락하였습니다."
+                        res.simpleOrder = orderToSimpleOrder(order, true)
+                    }
+                }
+            }
+        }
+        return res
     }
 
     @Transactional
-    override fun denyOrder(userDetails: UserDetailsImpl, id: Long): Any {
-        TODO("Not yet implemented")
+    override fun denyOrder(userDetails: UserDetailsImpl, id: Long): ManageOrderResponseDto {
+        var res = ManageOrderResponseDto()
+        if ("BUSINESS" !in userDetails.getUser().getAuthorities()) {
+            res.code = HttpServletResponse.SC_FORBIDDEN
+            res.msg = "권한이 부족합니다."
+        } else {
+            if (!storeRepository.existsByOwner(userDetails.getUser())) {
+                res.code = HttpServletResponse.SC_BAD_REQUEST
+                res.msg = "소유중인 가게가 존재하지 않습니다."
+            } else {
+                if (!orderRepository.existsById(id)) {
+                    res.code = HttpServletResponse.SC_BAD_REQUEST
+                    res.msg = "존재하지 않는 주문 ID입니다."
+                } else {
+                    var order = orderRepository.findById(id).get()
+                    if (order.store!!.owner != userDetails.getUser()) {
+                        res.code = HttpServletResponse.SC_FORBIDDEN
+                        res.msg = "권한이 부족합니다."
+                    } else {
+                        order.updateStatus(Order.Status.CANCEL)
+                        res.code = HttpServletResponse.SC_OK
+                        res.msg = "성공적으로 거절하였습니다."
+                        res.simpleOrder = orderToSimpleOrder(order, true)
+                    }
+                }
+            }
+        }
+        return res
     }
 
     @Transactional
-    override fun updateOrder(userDetails: UserDetailsImpl, id: Long, status: Order.Status): Any {
-        TODO("Not yet implemented")
+    override fun updateOrder(userDetails: UserDetailsImpl, id: Long, status: Order.Status): ManageOrderResponseDto {
+        var res = ManageOrderResponseDto()
+        if ("BUSINESS" !in userDetails.getUser().getAuthorities() || "ADMIN" !in userDetails.getUser().getAuthorities()) {
+            res.code = HttpServletResponse.SC_FORBIDDEN
+            res.msg = "권한이 부족합니다."
+        } else {
+            if ("ADMIN" !in userDetails.getUser().getAuthorities() && !storeRepository.existsByOwner(userDetails.getUser())) {
+                res.code = HttpServletResponse.SC_BAD_REQUEST
+                res.msg = "소유중인 가게가 존재하지 않습니다."
+            } else {
+                if (!orderRepository.existsById(id)) {
+                    res.code = HttpServletResponse.SC_BAD_REQUEST
+                    res.msg = "존재하지 않는 주문 ID입니다."
+                } else {
+                    var order = orderRepository.findById(id).get()
+                    if ("ADMIN" !in userDetails.getUser().getAuthorities() && order.store!!.owner != userDetails.getUser()) {
+                        res.code = HttpServletResponse.SC_FORBIDDEN
+                        res.msg = "권한이 부족합니다."
+                    } else {
+                        order.updateStatus(Order.Status.CANCEL)
+                        res.code = HttpServletResponse.SC_OK
+                        res.msg = "성공적으로 업데이트하였습니다."
+                        res.simpleOrder = orderToSimpleOrder(order, true)
+                    }
+                }
+            }
+        }
+        return res
+    }
+
+    fun orderToSimpleOrder(order: Order, isBusiness: Boolean): SimpleOrder {
+        var orderedMenuList = orderedMenuRepository.findByOrder(order)
+        var menuNameList = arrayListOf<String>()
+        var quantityList = arrayListOf<Int>()
+        for (orderedMenu in orderedMenuList) {
+            menuNameList.add(orderedMenu.menu!!.menuName)
+            quantityList.add(orderedMenu.quantity)
+        }
+        var simpleOrder = SimpleOrder()
+        simpleOrder.orderId = order.id
+        simpleOrder.menuNameList = menuNameList
+        simpleOrder.quantityList = quantityList
+        simpleOrder.status = order.status
+        if (isBusiness) {
+            simpleOrder.priceSum = order.initialPrice
+        } else {
+            simpleOrder.priceSum = order.finalPrice
+        }
+        return simpleOrder
     }
 
 

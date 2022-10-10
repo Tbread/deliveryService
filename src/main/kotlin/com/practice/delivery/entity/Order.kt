@@ -16,7 +16,8 @@ class Order:Timestamped() {
         AWAIT,
         COOKING,
         DELIVERING,
-        COMPLETE
+        COMPLETE,
+        CANCEL
     }
 
     @Id
