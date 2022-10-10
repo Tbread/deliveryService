@@ -45,4 +45,8 @@ class Coupon:Timestamped {
     fun useCoupon(){
         this.available = false
     }
+
+    fun cancelOrder(){
+        this.available = true
+    }
 }

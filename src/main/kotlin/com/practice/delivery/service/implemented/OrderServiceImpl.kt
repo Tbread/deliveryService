@@ -27,7 +27,11 @@ class OrderServiceImpl(
 ) : OrderService {
 
     @Transactional
-    override fun order(userDetails: UserDetailsImpl, req: OrderRequestDto,bindingResult: BindingResult): DefaultResponseDto {
+    override fun order(
+        userDetails: UserDetailsImpl,
+        req: OrderRequestDto,
+        bindingResult: BindingResult
+    ): DefaultResponseDto {
         var res = DefaultResponseDto()
         if (userDetails.getUser().getAuth() != "DEFAULT") {
             res.code = HttpServletResponse.SC_FORBIDDEN
@@ -165,8 +169,8 @@ class OrderServiceImpl(
         if ("BUSINESS" !in userDetails.getUser().getAuthorities()) {
             //일반 유저 로직
             var orderList = orderRepository.findByOrderer(userDetails.getUser())
-            for (order in orderList){
-                var simpleOrder = orderToSimpleOrder(order,false)
+            for (order in orderList) {
+                var simpleOrder = orderToSimpleOrder(order, false)
                 simpleOrderList.add(simpleOrder)
             }
             res.code = HttpServletResponse.SC_OK
@@ -211,10 +215,15 @@ class OrderServiceImpl(
                         res.code = HttpServletResponse.SC_FORBIDDEN
                         res.msg = "권한이 부족합니다."
                     } else {
-                        order.updateStatus(Order.Status.COOKING)
-                        res.code = HttpServletResponse.SC_OK
-                        res.msg = "성공적으로 수락하였습니다."
-                        res.simpleOrder = orderToSimpleOrder(order, true)
+                        if (order.status != Order.Status.AWAIT) {
+                            res.code = HttpServletResponse.SC_BAD_REQUEST
+                            res.msg = "승낙 대기중인 주문건이 아닙니다."
+                        } else {
+                            order.updateStatus(Order.Status.COOKING)
+                            res.code = HttpServletResponse.SC_OK
+                            res.msg = "성공적으로 수락하였습니다."
+                            res.simpleOrder = orderToSimpleOrder(order, true)
+                        }
                     }
                 }
             }
@@ -242,10 +251,20 @@ class OrderServiceImpl(
                         res.code = HttpServletResponse.SC_FORBIDDEN
                         res.msg = "권한이 부족합니다."
                     } else {
-                        order.updateStatus(Order.Status.CANCEL)
-                        res.code = HttpServletResponse.SC_OK
-                        res.msg = "성공적으로 거절하였습니다."
-                        res.simpleOrder = orderToSimpleOrder(order, true)
+                        if (order.status != Order.Status.AWAIT) {
+                            res.code = HttpServletResponse.SC_BAD_REQUEST
+                            res.msg = "승낙 대기중인 주문건이 아닙니다."
+                        } else {
+                            order.updateStatus(Order.Status.CANCEL)
+                            if (Objects.nonNull(order.usedCoupon)) {
+                                //사용한 쿠폰이 있을경우
+                                order.usedCoupon!!.cancelOrder()
+                                //쿠폰 상태 업데이트
+                            }
+                            res.code = HttpServletResponse.SC_OK
+                            res.msg = "성공적으로 거절하였습니다."
+                            res.simpleOrder = orderToSimpleOrder(order, true)
+                        }
                     }
                 }
             }
@@ -254,13 +273,21 @@ class OrderServiceImpl(
     }
 
     @Transactional
-    override fun updateOrder(userDetails: UserDetailsImpl, id: Long, req:UpdateOrderStatusRequestDto): ManageOrderResponseDto {
+    override fun updateOrder(
+        userDetails: UserDetailsImpl,
+        id: Long,
+        req: UpdateOrderStatusRequestDto
+    ): ManageOrderResponseDto {
         var res = ManageOrderResponseDto()
-        if ("BUSINESS" !in userDetails.getUser().getAuthorities() || "ADMIN" !in userDetails.getUser().getAuthorities()) {
+        if ("BUSINESS" !in userDetails.getUser().getAuthorities() || "ADMIN" !in userDetails.getUser()
+                .getAuthorities()
+        ) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
         } else {
-            if ("ADMIN" !in userDetails.getUser().getAuthorities() && !storeRepository.existsByOwner(userDetails.getUser())) {
+            if ("ADMIN" !in userDetails.getUser()
+                    .getAuthorities() && !storeRepository.existsByOwner(userDetails.getUser())
+            ) {
                 res.code = HttpServletResponse.SC_BAD_REQUEST
                 res.msg = "소유중인 가게가 존재하지 않습니다."
             } else {
@@ -269,11 +296,28 @@ class OrderServiceImpl(
                     res.msg = "존재하지 않는 주문 ID입니다."
                 } else {
                     var order = orderRepository.findById(id).get()
-                    if ("ADMIN" !in userDetails.getUser().getAuthorities() && order.store!!.owner != userDetails.getUser()) {
+                    if ("ADMIN" !in userDetails.getUser()
+                            .getAuthorities() && order.store!!.owner != userDetails.getUser()
+                    ) {
                         res.code = HttpServletResponse.SC_FORBIDDEN
                         res.msg = "권한이 부족합니다."
                     } else {
+                        if (order.status == Order.Status.CANCEL) {
+                            //현재 주문상태가 취소상태인 주문을 변경하는경우
+                            if ("ADMIN" !in userDetails.getUser().getAuthorities()) {
+                                //관리자가 아니라면
+                                res.code = HttpServletResponse.SC_FORBIDDEN
+                                res.msg = "권한이 부족합니다."
+                            }
+                        }
                         order.updateStatus(req.status)
+                        if (req.status == Order.Status.CANCEL) {
+                            //주문 취소 요청건인경우
+                            if (Objects.nonNull(order.usedCoupon)) {
+                                //적용된 쿠폰이 있다면
+                                order.usedCoupon!!.cancelOrder()
+                            }
+                        }
                         res.code = HttpServletResponse.SC_OK
                         res.msg = "성공적으로 업데이트하였습니다."
                         res.simpleOrder = orderToSimpleOrder(order, true)
