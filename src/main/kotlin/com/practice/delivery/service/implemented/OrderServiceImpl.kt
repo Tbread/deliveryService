@@ -2,7 +2,9 @@ package com.practice.delivery.service.implemented
 
 import com.practice.delivery.dto.request.OrderRequestDto
 import com.practice.delivery.dto.response.DefaultResponseDto
+import com.practice.delivery.dto.response.ViewOrderListResponseDto
 import com.practice.delivery.entity.*
+import com.practice.delivery.model.SimpleOrder
 import com.practice.delivery.repository.*
 import com.practice.delivery.service.OrderService
 import org.springframework.stereotype.Service
@@ -17,7 +19,8 @@ class OrderServiceImpl(
     private var orderedMenuRepository: OrderedMenuRepository,
     private var menuRepository: MenuRepository,
     private var menuOptionRepository: MenuOptionRepository,
-    private var couponRepository: CouponRepository
+    private var couponRepository: CouponRepository,
+    private var storeRepository: StoreRepository
 ) : OrderService {
 
     @Transactional
@@ -133,6 +136,7 @@ class OrderServiceImpl(
                     finalPrice = initialPrice - discounted
                     order.finalPrice = finalPrice
                     order.usedCoupon = coupon
+                    order.store = orderedMenuList[0].menu!!.store
                     orderRepository.save(order)
                     for (orderedMenu in orderedMenuList){
                         orderedMenu.order = order
@@ -145,5 +149,58 @@ class OrderServiceImpl(
         }
         return res
     }
+
+    override fun viewOrderList(userDetails: UserDetailsImpl): ViewOrderListResponseDto {
+        //Dto 에서 status 를 받아서 해당 status 만 불러오도록 하는게 나을지도?
+        var res = ViewOrderListResponseDto()
+        if ("BUSINESS" !in userDetails.getUser().getAuthorities()){
+            res.code = HttpServletResponse.SC_FORBIDDEN
+            res.msg = "권한이 부족합니다."
+        } else {
+            if (!storeRepository.existsByOwner(userDetails.getUser())){
+                res.code = HttpServletResponse.SC_BAD_REQUEST
+                res.msg = "소유중인 가게가 존재하지 않습니다."
+            } else {
+                var orderList = orderRepository.findByStore(storeRepository.findByOwner(userDetails.getUser())!!)
+                var simpleOrderList = arrayListOf<SimpleOrder>()
+                for (order in orderList){
+                    var orderedMenuList = orderedMenuRepository.findByOrder(order)
+                    var menuNameList = arrayListOf<String>()
+                    var quantityList = arrayListOf<Int>()
+                    for (orderedMenu in orderedMenuList){
+                        menuNameList.add(orderedMenu.menu!!.menuName)
+                        quantityList.add(orderedMenu.quantity)
+                    }
+                    var simpleOrder = SimpleOrder()
+                    simpleOrder.orderId = order.id
+                    simpleOrder.menuNameList = menuNameList
+                    simpleOrder.quantityList = quantityList
+                    simpleOrder.status = order.status
+                    simpleOrder.priceSum = order.initialPrice
+                    simpleOrderList.add(simpleOrder)
+                }
+                res.code = HttpServletResponse.SC_OK
+                res.msg = "성공적으로 불러왔습니다."
+                res.simpleOrderList = simpleOrderList
+            }
+        }
+        return res
+    }
+
+    @Transactional
+    override fun acceptOrder(userDetails: UserDetailsImpl, id: Long): Any {
+        TODO("Not yet implemented")
+    }
+
+    @Transactional
+    override fun denyOrder(userDetails: UserDetailsImpl, id: Long): Any {
+        TODO("Not yet implemented")
+    }
+
+    @Transactional
+    override fun updateOrder(userDetails: UserDetailsImpl, id: Long, status: Order.Status): Any {
+        TODO("Not yet implemented")
+    }
+
 
 }

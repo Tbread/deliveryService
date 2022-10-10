@@ -40,6 +40,10 @@ class Order:Timestamped() {
     @Column(nullable = false)
     var finalPrice:Int = 0
 
+    @ManyToOne
+    @JoinColumn
+    var store:Store? = null
+
 
     fun updateStatus(status: Status){
         this.status = status
