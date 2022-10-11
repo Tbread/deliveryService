@@ -43,4 +43,5 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    systemProperty("jasypt.encryptor.password",System.getProperty("jasypt.encryptor.password"))
 }
