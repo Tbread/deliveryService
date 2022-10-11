@@ -1,6 +1,7 @@
 package com.practice.delivery.dto.request
 
 import com.practice.delivery.entity.Role
+import com.practice.delivery.utils.validator.ValidCustomEnum
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotNull
 

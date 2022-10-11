@@ -10,7 +10,7 @@ import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 
 @Entity
-class Order:Timestamped() {
+class DeliveryOrder:Timestamped() {
 
     enum class Status {
         AWAIT,

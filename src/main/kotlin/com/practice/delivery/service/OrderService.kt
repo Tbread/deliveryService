@@ -5,7 +5,6 @@ import com.practice.delivery.dto.request.UpdateOrderStatusRequestDto
 import com.practice.delivery.dto.response.DefaultResponseDto
 import com.practice.delivery.dto.response.ManageOrderResponseDto
 import com.practice.delivery.dto.response.ViewOrderListResponseDto
-import com.practice.delivery.entity.Order
 import com.practice.delivery.service.implemented.UserDetailsImpl
 import org.springframework.validation.BindingResult
 

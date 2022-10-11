@@ -108,8 +108,8 @@ class OrderServiceImpl(
                             }
                         }
                         //메인 주문 로직
-                        var order = Order()
-                        order.orderer = userDetails.getUser()
+                        var deliveryOrder = DeliveryOrder()
+                        deliveryOrder.orderer = userDetails.getUser()
                         var orderedMenuList = arrayListOf<OrderedMenu>()
                         var priceList = ArrayList<Int>()
                         for (i: Int in 0 until menuList.size) {
@@ -120,7 +120,7 @@ class OrderServiceImpl(
                             orderedMenuList.add(orderedMenu)
                         }
                         var initialPrice: Int = priceList.sum()
-                        order.initialPrice = initialPrice
+                        deliveryOrder.initialPrice = initialPrice
                         var finalPrice: Int = 0
                         var discounted: Int = 0
                         if (Objects.nonNull(coupon)) {
@@ -145,12 +145,12 @@ class OrderServiceImpl(
                             coupon.useCoupon()
                         }
                         finalPrice = initialPrice - discounted
-                        order.finalPrice = finalPrice
-                        order.usedCoupon = coupon
-                        order.store = orderedMenuList[0].menu!!.store
-                        orderRepository.save(order)
+                        deliveryOrder.finalPrice = finalPrice
+                        deliveryOrder.usedCoupon = coupon
+                        deliveryOrder.store = orderedMenuList[0].menu!!.store
+                        orderRepository.save(deliveryOrder)
                         for (orderedMenu in orderedMenuList) {
-                            orderedMenu.order = order
+                            orderedMenu.deliveryOrder = deliveryOrder
                             orderedMenuRepository.save(orderedMenu)
                         }
                         res.code = HttpServletResponse.SC_OK
@@ -215,11 +215,11 @@ class OrderServiceImpl(
                         res.code = HttpServletResponse.SC_FORBIDDEN
                         res.msg = "권한이 부족합니다."
                     } else {
-                        if (order.status != Order.Status.AWAIT) {
+                        if (order.status != DeliveryOrder.Status.AWAIT) {
                             res.code = HttpServletResponse.SC_BAD_REQUEST
                             res.msg = "승낙 대기중인 주문건이 아닙니다."
                         } else {
-                            order.updateStatus(Order.Status.COOKING)
+                            order.updateStatus(DeliveryOrder.Status.COOKING)
                             res.code = HttpServletResponse.SC_OK
                             res.msg = "성공적으로 수락하였습니다."
                             res.simpleOrder = orderToSimpleOrder(order, true)
@@ -251,11 +251,11 @@ class OrderServiceImpl(
                         res.code = HttpServletResponse.SC_FORBIDDEN
                         res.msg = "권한이 부족합니다."
                     } else {
-                        if (order.status != Order.Status.AWAIT) {
+                        if (order.status != DeliveryOrder.Status.AWAIT) {
                             res.code = HttpServletResponse.SC_BAD_REQUEST
                             res.msg = "승낙 대기중인 주문건이 아닙니다."
                         } else {
-                            order.updateStatus(Order.Status.CANCEL)
+                            order.updateStatus(DeliveryOrder.Status.CANCEL)
                             if (Objects.nonNull(order.usedCoupon)) {
                                 //사용한 쿠폰이 있을경우
                                 order.usedCoupon!!.cancelOrder()
@@ -302,7 +302,7 @@ class OrderServiceImpl(
                         res.code = HttpServletResponse.SC_FORBIDDEN
                         res.msg = "권한이 부족합니다."
                     } else {
-                        if (order.status == Order.Status.CANCEL) {
+                        if (order.status == DeliveryOrder.Status.CANCEL) {
                             //현재 주문상태가 취소상태인 주문을 변경하는경우
                             if ("ADMIN" !in userDetails.getUser().getAuthorities()) {
                                 //관리자가 아니라면
@@ -311,7 +311,7 @@ class OrderServiceImpl(
                             }
                         }
                         order.updateStatus(req.status)
-                        if (req.status == Order.Status.CANCEL) {
+                        if (req.status == DeliveryOrder.Status.CANCEL) {
                             //주문 취소 요청건인경우
                             if (Objects.nonNull(order.usedCoupon)) {
                                 //적용된 쿠폰이 있다면
@@ -328,8 +328,8 @@ class OrderServiceImpl(
         return res
     }
 
-    fun orderToSimpleOrder(order: Order, isBusiness: Boolean): SimpleOrder {
-        var orderedMenuList = orderedMenuRepository.findByOrder(order)
+    fun orderToSimpleOrder(deliveryOrder: DeliveryOrder, isBusiness: Boolean): SimpleOrder {
+        var orderedMenuList = orderedMenuRepository.findByDeliveryOrder(deliveryOrder)
         var menuNameList = arrayListOf<String>()
         var quantityList = arrayListOf<Int>()
         for (orderedMenu in orderedMenuList) {
@@ -337,14 +337,14 @@ class OrderServiceImpl(
             quantityList.add(orderedMenu.quantity)
         }
         var simpleOrder = SimpleOrder()
-        simpleOrder.orderId = order.id
+        simpleOrder.orderId = deliveryOrder.id
         simpleOrder.menuNameList = menuNameList
         simpleOrder.quantityList = quantityList
-        simpleOrder.status = order.status
+        simpleOrder.status = deliveryOrder.status
         if (isBusiness) {
-            simpleOrder.priceSum = order.initialPrice
+            simpleOrder.priceSum = deliveryOrder.initialPrice
         } else {
-            simpleOrder.priceSum = order.finalPrice
+            simpleOrder.priceSum = deliveryOrder.finalPrice
         }
         return simpleOrder
     }

@@ -17,7 +17,7 @@ class OrderedMenu {
 
     @ManyToOne
     @JoinColumn
-    var order:Order? = null
+    var deliveryOrder:DeliveryOrder? = null
 
     @ManyToOne
     @JoinColumn
