@@ -19,6 +19,6 @@ interface OrderService {
 
     fun denyOrder(userDetails: UserDetailsImpl,id:Long):ManageOrderResponseDto
 
-    fun updateOrder(userDetails: UserDetailsImpl,id: Long,req:UpdateOrderStatusRequestDto):ManageOrderResponseDto
+    fun updateOrderProgress(userDetails: UserDetailsImpl,id: Long,req:UpdateOrderStatusRequestDto):ManageOrderResponseDto
 
 }

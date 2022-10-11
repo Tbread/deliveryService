@@ -273,7 +273,7 @@ class OrderServiceImpl(
     }
 
     @Transactional
-    override fun updateOrder(
+    override fun updateOrderProgress(
         userDetails: UserDetailsImpl,
         id: Long,
         req: UpdateOrderStatusRequestDto

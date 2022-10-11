@@ -52,10 +52,10 @@ class OrderController(private var orderService: OrderService) {
     }
 
     @PostMapping("/update-status/{id}")
-    fun updateOrder(
+    fun updateOrderProgress(
         @AuthenticationPrincipal userDetails: UserDetailsImpl,
         @PathVariable id: Long,@RequestBody req:UpdateOrderStatusRequestDto
     ): ManageOrderResponseDto {
-        return orderService.updateOrder(userDetails, id,req)
+        return orderService.updateOrderProgress(userDetails, id,req)
     }
 }
