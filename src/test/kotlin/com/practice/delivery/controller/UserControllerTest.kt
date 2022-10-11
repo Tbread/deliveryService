@@ -2,7 +2,6 @@ package com.practice.delivery.controller
 
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.jayway.jsonpath.JsonPath
 import com.practice.delivery.dto.request.LoginRequestDto
 import com.practice.delivery.dto.request.RegisterUserRequestDto
 import com.practice.delivery.entity.Role
@@ -10,7 +9,6 @@ import com.practice.delivery.entity.User
 import com.practice.delivery.jwt.JwtTokenProvider
 import com.practice.delivery.repository.AdminUserRequestRepository
 import com.practice.delivery.repository.UserRepository
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test

@@ -4,7 +4,6 @@ import com.practice.delivery.dto.request.CreateCouponRequestDto
 import com.practice.delivery.dto.response.CreateCouponResponseDto
 import com.practice.delivery.dto.response.DefaultResponseDto
 import com.practice.delivery.service.implemented.UserDetailsImpl
-import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
 
 interface CouponService {

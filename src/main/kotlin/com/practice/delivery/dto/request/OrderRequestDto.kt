@@ -1,6 +1,5 @@
 package com.practice.delivery.dto.request
 
-import com.practice.delivery.entity.Menu
 import javax.validation.constraints.NotNull
 
 data class OrderRequestDto(

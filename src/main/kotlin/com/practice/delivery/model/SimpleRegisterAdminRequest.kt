@@ -1,7 +1,6 @@
 package com.practice.delivery.model
 
 import com.practice.delivery.entity.AdminUserRequest
-import java.time.LocalDateTime
 
 class SimpleRegisterAdminRequest {
     var id:Long? = null

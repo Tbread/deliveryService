@@ -6,16 +6,15 @@ import com.practice.delivery.dto.response.AddMenuResponseDto
 import com.practice.delivery.dto.response.DefaultResponseDto
 import com.practice.delivery.dto.response.ShowMenuResponseDto
 import com.practice.delivery.service.implemented.UserDetailsImpl
-import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
 
 interface MenuService {
 
-    fun addMenu(@AuthenticationPrincipal userDetails: UserDetailsImpl, req:AddMenuRequestDto, bindingResult: BindingResult):AddMenuResponseDto
+    fun addMenu(userDetails: UserDetailsImpl, req:AddMenuRequestDto, bindingResult: BindingResult):AddMenuResponseDto
 
     fun showMenuList(id:Long):ShowMenuResponseDto
 
-    fun removeMenu(@AuthenticationPrincipal userDetails: UserDetailsImpl,id:Long):DefaultResponseDto
+    fun removeMenu(userDetails: UserDetailsImpl,id:Long):DefaultResponseDto
 
-    fun updateMenu(@AuthenticationPrincipal userDetails: UserDetailsImpl, req:UpdateMenuRequestDto, id:Long,bindingResult: BindingResult):DefaultResponseDto
+    fun updateMenu(userDetails: UserDetailsImpl, req:UpdateMenuRequestDto, id:Long,bindingResult: BindingResult):DefaultResponseDto
 }

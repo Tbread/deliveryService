@@ -1,6 +1,5 @@
 package com.practice.delivery.utils.validator
 
-import com.practice.delivery.utils.validator.EnumValidator
 import javax.validation.Constraint
 import javax.validation.Payload
 import kotlin.reflect.KClass

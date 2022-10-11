@@ -1,6 +1,5 @@
 package com.practice.delivery.utils.validator
 
-import com.practice.delivery.utils.validator.ValidCustomEnum
 import javax.validation.ConstraintValidator
 import javax.validation.ConstraintValidatorContext
 
