@@ -153,6 +153,7 @@ class OrderServiceImpl(
                             orderedMenu.deliveryOrder = deliveryOrder
                             orderedMenuRepository.save(orderedMenu)
                         }
+                        userDetails.getUser().updateOrderDate()
                         res.code = HttpServletResponse.SC_OK
                         res.msg = "성공적으로 주문하였습니다."
                     }
