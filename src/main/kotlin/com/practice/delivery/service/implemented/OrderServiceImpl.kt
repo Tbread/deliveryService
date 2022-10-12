@@ -86,7 +86,7 @@ class OrderServiceImpl(
                         var coupon: Coupon? = null
                         if (Objects.nonNull(req.couponId)) {
                             if (couponRepository.existsById(req.couponId!!)) {
-                                coupon = couponRepository.findById(req.couponId!!).get()
+                                coupon = couponRepository.findById(req.couponId).get()
                                 if (coupon.expired) {
                                     //쿠폰이 만료됨
                                     res.code = HttpServletResponse.SC_BAD_REQUEST
