@@ -10,6 +10,7 @@ import com.practice.delivery.entity.Role
 import com.practice.delivery.service.implemented.UserDetailsImpl
 import com.practice.delivery.service.UserService
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
@@ -52,21 +53,27 @@ class UserController(private var userService: UserService) {
         return userService.login(req, bindingResult)
     }
 
-    @Operation(summary = "관리자 가입 신청 리스트 조회 API")
+    @Operation(summary = "관리자 가입 신청 리스트 조회 API", description = "헤더에 Authorization 으로 JWT 토큰을 요구합니다.")
     @GetMapping("/register-admin-request-list")
-    fun viewRegisterAdminRequestList(@AuthenticationPrincipal userDetails: UserDetailsImpl): ViewRegisterAdminRequestListResponseDto {
+    fun viewRegisterAdminRequestList(@Parameter(hidden = true) @AuthenticationPrincipal userDetails: UserDetailsImpl): ViewRegisterAdminRequestListResponseDto {
         return userService.viewRegisterAdminList(userDetails)
     }
 
-    @Operation(summary = "관리자 가입 신청 수락 API")
+    @Operation(summary = "관리자 가입 신청 수락 API", description = "헤더에 Authorization 으로 JWT 토큰을 요구합니다.")
     @GetMapping("/accept-admin-request/{id}")
-    fun acceptRegisterAdmin(@AuthenticationPrincipal userDetails: UserDetailsImpl, @PathVariable id: Long): ManageRegisterAdminResponseDto {
+    fun acceptRegisterAdmin(
+        @Parameter(hidden = true) @AuthenticationPrincipal userDetails: UserDetailsImpl,
+        @PathVariable id: Long
+    ): ManageRegisterAdminResponseDto {
         return userService.acceptRegisterAdmin(userDetails, id)
     }
 
-    @Operation(summary = "관리자 가입 신청 거절 API")
+    @Operation(summary = "관리자 가입 신청 거절 API", description = "헤더에 Authorization 으로 JWT 토큰을 요구합니다.")
     @GetMapping("/deny-admin-request/{id}")
-    fun denyRegisterAdmin(@AuthenticationPrincipal userDetails: UserDetailsImpl, @PathVariable id: Long): ManageRegisterAdminResponseDto {
+    fun denyRegisterAdmin(
+        @Parameter(hidden = true) @AuthenticationPrincipal userDetails: UserDetailsImpl,
+        @PathVariable id: Long
+    ): ManageRegisterAdminResponseDto {
         return userService.denyRegisterAdmin(userDetails, id)
     }
 }
