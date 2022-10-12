@@ -78,6 +78,7 @@ class CouponServiceImpl(
                 } else {
                     var coupon = Coupon(masterCoupon,userDetails.getUser())
                     couponRepository.save(coupon)
+                    masterCoupon.issuanceCoupon()
                     res.code = HttpServletResponse.SC_OK
                     res.msg = "성공적으로 쿠폰을 발급받았습니다."
                 }

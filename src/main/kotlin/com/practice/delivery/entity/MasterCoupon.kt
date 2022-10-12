@@ -57,5 +57,9 @@ class MasterCoupon:Timestamped {
         this.expired = true
     }
 
+    fun issuanceCoupon(){
+        this.quantity = quantity - 1
+    }
+
 
 }
