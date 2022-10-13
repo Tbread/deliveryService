@@ -1,0 +1,22 @@
+package com.practice.delivery.repository.dslrepository
+
+import com.practice.delivery.entity.QReview
+import com.practice.delivery.entity.Store
+import com.querydsl.jpa.impl.JPAQueryFactory
+import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
+
+@Suppress("SpringJavaInjectionPointsAutowiringInspection")
+@Repository
+class QReviewRepository(private val jpaQueryFactory: JPAQueryFactory) {
+
+    fun calculateScore(store: Store):Double{
+        return jpaQueryFactory.selectFrom(QReview.review)
+            .where(QReview.review.createdAt.between(LocalDateTime.now().minusWeeks(1), LocalDateTime.now()))
+            .where(QReview.review.store.eq(store))
+            .where(QReview.review.deleted.eq(false))
+            .select(QReview.review.score.avg())
+            .fetchFirst()
+    }
+
+}

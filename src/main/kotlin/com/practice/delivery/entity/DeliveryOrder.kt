@@ -45,9 +45,17 @@ class DeliveryOrder:Timestamped() {
     @JoinColumn
     var store:Store? = null
 
+    @Column(nullable = false)
+    var reviewed:Boolean = false
+
 
     fun updateStatus(status: Status){
         this.status = status
     }
+
+    fun createReview(){
+        this.reviewed = true
+    }
+
 
 }
