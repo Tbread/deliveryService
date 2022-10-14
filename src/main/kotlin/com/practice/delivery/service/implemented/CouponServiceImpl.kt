@@ -4,6 +4,7 @@ import com.practice.delivery.dto.request.CreateCouponRequestDto
 import com.practice.delivery.dto.response.CreateCouponResponseDto
 import com.practice.delivery.dto.response.DefaultResponseDto
 import com.practice.delivery.entity.Coupon
+import com.practice.delivery.entity.CouponIssuanceLog
 import com.practice.delivery.entity.MasterCoupon
 import com.practice.delivery.model.SimpleCoupon
 import com.practice.delivery.repository.CouponIssuanceLogRepository
@@ -79,6 +80,8 @@ class CouponServiceImpl(
                     val coupon = Coupon(masterCoupon,userDetails.getUser())
                     couponRepository.save(coupon)
                     masterCoupon.issuanceCoupon()
+                    val couponIssuanceLog = CouponIssuanceLog(userDetails.getUser(),masterCoupon)
+                    couponIssuanceLogRepository.save(couponIssuanceLog)
                     res.code = HttpServletResponse.SC_OK
                     res.msg = "성공적으로 쿠폰을 발급받았습니다."
                 }
