@@ -5,6 +5,7 @@ import com.practice.delivery.entity.MenuOption
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface MenuOptionRepository:JpaRepository<MenuOption,Long> {
-    fun findByTopMenu(topMenu:Menu):List<MenuOption>
+
     fun findBySubMenu(subMenu:Menu):MenuOption?
+    
 }

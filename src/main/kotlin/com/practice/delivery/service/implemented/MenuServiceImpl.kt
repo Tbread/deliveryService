@@ -12,6 +12,7 @@ import com.practice.delivery.model.SimpleMenu
 import com.practice.delivery.repository.MenuOptionRepository
 import com.practice.delivery.repository.MenuRepository
 import com.practice.delivery.repository.StoreRepository
+import com.practice.delivery.repository.dslrepository.QMenuOptionRepository
 import com.practice.delivery.service.MenuService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -23,7 +24,8 @@ import javax.servlet.http.HttpServletResponse
 class MenuServiceImpl(
     private var menuRepository: MenuRepository,
     private var menuOptionRepository: MenuOptionRepository,
-    private var storeRepository: StoreRepository
+    private var storeRepository: StoreRepository,
+    private var qMenuOptionRepository: QMenuOptionRepository
 ) : MenuService {
 
     @Transactional
@@ -92,7 +94,7 @@ class MenuServiceImpl(
             val menuList = menuRepository.findByStoreAndThisIsOption(storeRepository.findById(id).get(),false)
             val simpleMenuList = arrayListOf<SimpleMenu>()
             for (topMenu:Menu in menuList){
-                val menuOptionList = menuOptionRepository.findByTopMenu(topMenu)
+                val menuOptionList = qMenuOptionRepository.findByMainMenu(topMenu)
                 val subMenuList = arrayListOf<OptionMenu>()
                 for (menuOption in menuOptionList){
                     val subMenu = OptionMenu(menuOption.subMenu!!)
@@ -127,7 +129,7 @@ class MenuServiceImpl(
                         //옵션메뉴인 경우
                         val menuOption = menuOptionRepository.findBySubMenu(selectedMenu.get())
                         val topMenu = menuOption!!.topMenu
-                        val menuOptionList = menuOptionRepository.findByTopMenu(topMenu!!)
+                        val menuOptionList = qMenuOptionRepository.findByMainMenu(topMenu!!)
                         if (menuOptionList.size == 1){
                             //해당메뉴 제거시 옵션메뉴가 전부 사라지는경우
                             topMenu.updateThisHasOption(false)
@@ -137,7 +139,7 @@ class MenuServiceImpl(
                         //메인메뉴인 경우
                         if (selectedMenu.get().thisHasOption){
                             //옵션메뉴가 존재하는경우
-                            val menuOptionList = menuOptionRepository.findByTopMenu(selectedMenu.get())
+                            val menuOptionList = qMenuOptionRepository.findByMainMenu(selectedMenu.get())
                             for (menuOption in menuOptionList){
                                 val subMenu = menuOption.subMenu
                                 menuOptionRepository.delete(menuOption)
