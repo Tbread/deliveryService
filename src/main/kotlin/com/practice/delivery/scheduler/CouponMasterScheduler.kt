@@ -21,11 +21,11 @@ class CouponScheduler(
     @Transactional
     @Async
     fun expiringCoupon() {
-        var masterList = masterCouponRepository.findByExpired(false)
+        val masterList = masterCouponRepository.findByExpired(false)
         for (master:MasterCoupon in masterList){
             if (master.expiryDate!!.isBefore(LocalDate.now()) || master.quantity <= 0){
                 master.expiringMasterCoupon()
-                var couponList = couponRepository.findByMasterCoupon(master)
+                val couponList = couponRepository.findByMasterCoupon(master)
                 for (coupon:Coupon in couponList){
                     coupon.expireCoupon()
                 }

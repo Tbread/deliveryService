@@ -32,7 +32,7 @@ class MenuServiceImpl(
         req: AddMenuRequestDto,
         bindingResult: BindingResult
     ): AddMenuResponseDto {
-        var res = AddMenuResponseDto()
+        val res = AddMenuResponseDto()
         if (Objects.isNull(userDetails.getUser())) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
@@ -49,8 +49,8 @@ class MenuServiceImpl(
                         res.code = HttpServletResponse.SC_BAD_REQUEST
                         res.msg = bindingResult.allErrors[0].defaultMessage
                     } else {
-                        var store = storeRepository.findByOwner(userDetails.getUser())
-                        var mainMenu = Menu()
+                        val store = storeRepository.findByOwner(userDetails.getUser())
+                        val mainMenu = Menu()
                         mainMenu.menuName = req.menuName!!
                         mainMenu.desc = req.desc
                         mainMenu.imgSrc = req.imgSrc
@@ -61,8 +61,8 @@ class MenuServiceImpl(
                         menuRepository.save(mainMenu)
                         if (mainMenu.thisHasOption){
                             for (subMenuRequest:OptionMenu in req.optionMenuList!!){
-                                var subMenu = Menu()
-                                var menuOption = MenuOption()
+                                val subMenu = Menu()
+                                val menuOption = MenuOption()
                                 subMenu.menuName = subMenuRequest.name
                                 subMenu.price = subMenuRequest.price
                                 subMenu.thisIsOption = true
@@ -84,18 +84,18 @@ class MenuServiceImpl(
     }
 
     override fun showMenuList(id: Long): ShowMenuResponseDto {
-        var res = ShowMenuResponseDto()
+        val res = ShowMenuResponseDto()
         if (!storeRepository.existsById(id)){
             res.code = HttpServletResponse.SC_BAD_REQUEST
             res.msg = "존재하지 않는 가게 ID입니다."
         } else {
-            var menuList = menuRepository.findByStoreAndThisIsOption(storeRepository.findById(id).get(),false)
-            var simpleMenuList = arrayListOf<SimpleMenu>()
+            val menuList = menuRepository.findByStoreAndThisIsOption(storeRepository.findById(id).get(),false)
+            val simpleMenuList = arrayListOf<SimpleMenu>()
             for (topMenu:Menu in menuList){
-                var menuOptionList = menuOptionRepository.findByTopMenu(topMenu)
-                var subMenuList = arrayListOf<OptionMenu>()
+                val menuOptionList = menuOptionRepository.findByTopMenu(topMenu)
+                val subMenuList = arrayListOf<OptionMenu>()
                 for (menuOption in menuOptionList){
-                    var subMenu = OptionMenu(menuOption.subMenu!!)
+                    val subMenu = OptionMenu(menuOption.subMenu!!)
                     subMenuList.add(subMenu)
                 }
                 simpleMenuList.add(SimpleMenu(topMenu,subMenuList))
@@ -109,12 +109,12 @@ class MenuServiceImpl(
 
     @Transactional
     override fun removeMenu(userDetails: UserDetailsImpl, id: Long): DefaultResponseDto {
-        var res = DefaultResponseDto()
+        val res = DefaultResponseDto()
         if ("BUSINESS" !in userDetails.getUser().getAuthorities()){
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
         } else {
-            var selectedMenu = menuRepository.findById(id)
+            val selectedMenu = menuRepository.findById(id)
             if (!menuRepository.existsById(id)){
                 res.code = HttpServletResponse.SC_BAD_REQUEST
                 res.msg = "존재하지 않는 메뉴 ID입니다."
@@ -125,9 +125,9 @@ class MenuServiceImpl(
                 } else {
                     if (selectedMenu.get().thisIsOption){
                         //옵션메뉴인 경우
-                        var menuOption = menuOptionRepository.findBySubMenu(selectedMenu.get())
-                        var topMenu = menuOption!!.topMenu
-                        var menuOptionList = menuOptionRepository.findByTopMenu(topMenu!!)
+                        val menuOption = menuOptionRepository.findBySubMenu(selectedMenu.get())
+                        val topMenu = menuOption!!.topMenu
+                        val menuOptionList = menuOptionRepository.findByTopMenu(topMenu!!)
                         if (menuOptionList.size == 1){
                             //해당메뉴 제거시 옵션메뉴가 전부 사라지는경우
                             topMenu.updateThisHasOption(false)
@@ -137,9 +137,9 @@ class MenuServiceImpl(
                         //메인메뉴인 경우
                         if (selectedMenu.get().thisHasOption){
                             //옵션메뉴가 존재하는경우
-                            var menuOptionList = menuOptionRepository.findByTopMenu(selectedMenu.get())
+                            val menuOptionList = menuOptionRepository.findByTopMenu(selectedMenu.get())
                             for (menuOption in menuOptionList){
-                                var subMenu = menuOption.subMenu
+                                val subMenu = menuOption.subMenu
                                 menuOptionRepository.delete(menuOption)
                                 menuRepository.delete(subMenu!!)
                             }
@@ -156,7 +156,7 @@ class MenuServiceImpl(
 
     @Transactional
     override fun updateMenu(userDetails: UserDetailsImpl, req: UpdateMenuRequestDto, id:Long,bindingResult: BindingResult): DefaultResponseDto {
-        var res = DefaultResponseDto()
+        val res = DefaultResponseDto()
         if ("BUSINESS" !in userDetails.getUser().getAuthorities()) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
@@ -169,7 +169,7 @@ class MenuServiceImpl(
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "존재하지 않는 메뉴 ID입니다."
                 } else {
-                    var menu = menuRepository.findById(id).get()
+                    val menu = menuRepository.findById(id).get()
                     if (menu.store!!.owner != userDetails.getUser()) {
                         res.code = HttpServletResponse.SC_FORBIDDEN
                         res.msg = "권한이 부족합니다."

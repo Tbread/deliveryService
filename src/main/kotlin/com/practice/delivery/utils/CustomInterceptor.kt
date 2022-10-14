@@ -9,7 +9,7 @@ import javax.annotation.Resource
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class CustomInterceptor() : HandlerInterceptor {
+class CustomInterceptor : HandlerInterceptor {
 
     @Resource(name = "redisTemplate")
     lateinit var valueOpsIpInfo: ValueOperations<String, Int>
@@ -18,7 +18,7 @@ class CustomInterceptor() : HandlerInterceptor {
     lateinit var valueOpsBanInfo: ValueOperations<String, LocalDateTime>
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        var ip = getIp(request)
+        val ip = getIp(request)
         if (Objects.nonNull(ip)) {
             if (Objects.isNull(valueOpsBanInfo.get(ip!!))) {
                 val cnt = valueOpsIpInfo.get(ip)
@@ -45,22 +45,22 @@ class CustomInterceptor() : HandlerInterceptor {
             ip = request.getHeader("Proxy-Client-IP")
         }
         if (ip == null || ip.isEmpty() || "unknown".equals(ip, ignoreCase = true)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
+            ip = request.getHeader("WL-Proxy-Client-IP")
         }
         if (ip == null || ip.isEmpty() || "unknown".equals(ip, ignoreCase = true)) {
-            ip = request.getHeader("HTTP_CLIENT_IP");
+            ip = request.getHeader("HTTP_CLIENT_IP")
         }
         if (ip == null || ip.isEmpty() || "unknown".equals(ip, ignoreCase = true)) {
-            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR")
         }
         if (ip == null || ip.isEmpty() || "unknown".equals(ip, ignoreCase = true)) {
-            ip = request.getHeader("X-Real-IP");
+            ip = request.getHeader("X-Real-IP")
         }
         if (ip == null || ip.isEmpty() || "unknown".equals(ip, ignoreCase = true)) {
-            ip = request.getHeader("X-RealIP");
+            ip = request.getHeader("X-RealIP")
         }
         if (ip == null || ip.isEmpty() || "unknown".equals(ip, ignoreCase = true)) {
-            ip = request.getHeader("REMOTE_ADDR");
+            ip = request.getHeader("REMOTE_ADDR")
         }
         if (ip == null || ip.isEmpty() || "unknown".equals(ip, ignoreCase = true)) {
             ip = request.remoteAddr

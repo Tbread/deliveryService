@@ -29,12 +29,12 @@ class ReviewServiceImpl(
         userDetails: UserDetailsImpl,
         req: WriteReviewRequestDto, bindingResult: BindingResult
     ): WriteReviewResponseDto {
-        var res = WriteReviewResponseDto()
+        val res = WriteReviewResponseDto()
         if (!orderRepository.existsById(req.orderId)){
             res.code = HttpServletResponse.SC_BAD_REQUEST
             res.msg = "존재하지 않는 주문 ID입니다."
         } else {
-            var order = orderRepository.findById(req.orderId).get()
+            val order = orderRepository.findById(req.orderId).get()
             if (userDetails.getUser() != order.orderer){
                 res.code = HttpServletResponse.SC_FORBIDDEN
                 res.msg = "권한이 부족합니다."
@@ -43,7 +43,7 @@ class ReviewServiceImpl(
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "이미 리뷰가 작성된 주문건입니다."
                 } else {
-                    var review = Review(userDetails.getUser(),order,req.content,req.imgSrc,req.score)
+                    val review = Review(userDetails.getUser(),order,req.content,req.imgSrc,req.score)
                     reviewRepository.save(review)
                     res.code = HttpServletResponse.SC_OK
                     res.msg = "성공적으로 리뷰를 작성하였습니다."
@@ -56,12 +56,12 @@ class ReviewServiceImpl(
 
     @Transactional
     override fun deleteReview(userDetails: UserDetailsImpl, id: Long): DefaultResponseDto {
-        var res = DefaultResponseDto()
+        val res = DefaultResponseDto()
         if (!reviewRepository.existsById(id)){
             res.code = HttpServletResponse.SC_BAD_REQUEST
             res.msg = "존재하지 않는 리뷰 ID입니다."
         } else {
-            var review = reviewRepository.findById(id).get()
+            val review = reviewRepository.findById(id).get()
             if (userDetails.getUser() != review.user){
                 res.code = HttpServletResponse.SC_FORBIDDEN
                 res.msg = "권한이 부족합니다."
@@ -75,7 +75,7 @@ class ReviewServiceImpl(
     }
 
     override fun viewReviewList(userDetails: UserDetailsImpl): ViewReviewListResponseDto {
-        var res = ViewReviewListResponseDto()
+        val res = ViewReviewListResponseDto()
         if (userDetails.getUser().getAuth() == "BUSINESS"){
             //사업자 유저 로직
             if (!storeRepository.existsByOwner(userDetails.getUser())){
@@ -83,14 +83,14 @@ class ReviewServiceImpl(
                 res.code = HttpServletResponse.SC_BAD_REQUEST
                 res.msg = "소유중인 가게가 존재하지 않습니다."
             } else {
-                var reviewList = qReviewRepository.getLiveStoreReviewList(storeRepository.findByOwner(userDetails.getUser())!!)
+                val reviewList = qReviewRepository.getLiveStoreReviewList(storeRepository.findByOwner(userDetails.getUser())!!)
                 res.code = HttpServletResponse.SC_OK
                 res.msg = "성공적으로 불러왔습니다."
                 res.simpleReviewList = convertReviews(reviewList)
             }
         } else {
             //일반 유저 로직
-            var reviewList = qReviewRepository.getLiveUserReviewList(userDetails.getUser())
+            val reviewList = qReviewRepository.getLiveUserReviewList(userDetails.getUser())
             res.code = HttpServletResponse.SC_OK
             res.msg = "성공적으로 불러왔습니다."
             res.simpleReviewList = convertReviews(reviewList)
@@ -99,9 +99,9 @@ class ReviewServiceImpl(
     }
 
     fun convertReviews(reviewList:List<Review>):List<SimpleReview>{
-        var simpleReviewList = arrayListOf<SimpleReview>()
+        val simpleReviewList = arrayListOf<SimpleReview>()
         for (review in reviewList){
-            var simpleReview = SimpleReview(review)
+            val simpleReview = SimpleReview(review)
             simpleReviewList.add(simpleReview)
         }
         return simpleReviewList

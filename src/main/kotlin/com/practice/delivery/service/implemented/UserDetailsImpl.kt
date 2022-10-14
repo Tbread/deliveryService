@@ -15,8 +15,8 @@ class UserDetailsImpl(private var user: User) : UserDetails {
         return user
     }
 
-    override fun getAuthorities(): MutableCollection<out GrantedAuthority>? {
-        var authorities = arrayListOf<GrantedAuthority>()
+    override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
+        val authorities = arrayListOf<GrantedAuthority>()
         authorities.add(SimpleGrantedAuthority(user.getAuth()))
         return authorities
     }

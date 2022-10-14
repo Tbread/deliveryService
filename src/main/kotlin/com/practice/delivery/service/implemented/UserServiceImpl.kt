@@ -36,7 +36,7 @@ class UserServiceImpl(
         req: RegisterUserRequestDto,
         bindingResult: BindingResult
     ): RegisterUserResponseDto {
-        var res = RegisterUserResponseDto()
+        val res = RegisterUserResponseDto()
         if (bindingResult.hasErrors()) {
             res.code = HttpServletResponse.SC_BAD_REQUEST
             res.msg = bindingResult.allErrors[0].defaultMessage
@@ -45,7 +45,7 @@ class UserServiceImpl(
                 res.code = HttpServletResponse.SC_BAD_REQUEST
                 res.msg = "이미 존재하는 이메일입니다."
             } else {
-                var user = User()
+                val user = User()
                 user.email = req.email
                 user.password = passwordEncoder.encode(req.password)
                 user.role = req.role!!
@@ -61,7 +61,7 @@ class UserServiceImpl(
 
     @Transactional
     override fun registerAdminUser(req: RegisterUserRequestDto, bindingResult: BindingResult): RegisterUserResponseDto {
-        var res = RegisterUserResponseDto()
+        val res = RegisterUserResponseDto()
         if (bindingResult.hasErrors()) {
             res.code = HttpServletResponse.SC_BAD_REQUEST
             res.msg = bindingResult.allErrors[0].defaultMessage
@@ -74,7 +74,7 @@ class UserServiceImpl(
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "이미 존재하는 이메일입니다."
                 } else {
-                    var adminUserRequest = AdminUserRequest()
+                    val adminUserRequest = AdminUserRequest()
                     adminUserRequest.email = req.email
                     adminUserRequest.password = passwordEncoder.encode(req.password)
                     adminUserRequestRepository.save(adminUserRequest)
@@ -90,12 +90,12 @@ class UserServiceImpl(
 
     @Transactional
     override fun login(req: LoginRequestDto, bindingResult: BindingResult): LoginResponseDto {
-        var res = LoginResponseDto()
+        val res = LoginResponseDto()
         if (bindingResult.hasErrors()) {
             res.code = HttpServletResponse.SC_BAD_REQUEST
             res.msg = bindingResult.allErrors[0].defaultMessage
         } else {
-            var loadedUser = userRepository.findByEmail(req.email!!)
+            val loadedUser = userRepository.findByEmail(req.email!!)
             if (Objects.isNull(loadedUser)) {
                 res.code = HttpServletResponse.SC_BAD_REQUEST
                 res.msg = "잘못된 이메일 또는 패스워드입니다."
@@ -116,7 +116,7 @@ class UserServiceImpl(
     }
 
     override fun viewRegisterAdminList(userDetails: UserDetailsImpl): ViewRegisterAdminRequestListResponseDto {
-        var res = ViewRegisterAdminRequestListResponseDto()
+        val res = ViewRegisterAdminRequestListResponseDto()
         if (Objects.isNull(userDetails.getUser())) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
@@ -125,10 +125,10 @@ class UserServiceImpl(
                 res.code = HttpServletResponse.SC_FORBIDDEN
                 res.msg = "권한이 부족합니다."
             } else {
-                var simpleRegisterAdminRequestList = arrayListOf<SimpleRegisterAdminRequest>()
-                var adminUserRequestList = adminUserRequestRepository.findByStatus(AdminUserRequest.Status.AWAIT)
+                val simpleRegisterAdminRequestList = arrayListOf<SimpleRegisterAdminRequest>()
+                val adminUserRequestList = adminUserRequestRepository.findByStatus(AdminUserRequest.Status.AWAIT)
                 for (adminUserRequest in adminUserRequestList) {
-                    var simpleRegisterAdminRequest = SimpleRegisterAdminRequest(adminUserRequest)
+                    val simpleRegisterAdminRequest = SimpleRegisterAdminRequest(adminUserRequest)
                     simpleRegisterAdminRequestList.add(simpleRegisterAdminRequest)
                 }
                 res.simpleRequestList = simpleRegisterAdminRequestList
@@ -141,7 +141,7 @@ class UserServiceImpl(
 
     @Transactional
     override fun acceptRegisterAdmin(userDetails: UserDetailsImpl, id: Long): ManageRegisterAdminResponseDto {
-        var res = ManageRegisterAdminResponseDto()
+        val res = ManageRegisterAdminResponseDto()
         if (Objects.isNull(userDetails.getUser())){
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
@@ -150,13 +150,13 @@ class UserServiceImpl(
                 res.code = HttpServletResponse.SC_FORBIDDEN
                 res.msg = "권한이 부족합니다."
             } else {
-                var adminUserRequest = adminUserRequestRepository.findById(id)
+                val adminUserRequest = adminUserRequestRepository.findById(id)
                 if (!adminUserRequestRepository.existsById(id)){
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "존재하지 않는 요청 ID입니다."
                 } else {
                     adminUserRequest.get().acceptRequest(userDetails.getUser())
-                    var adminUser = User()
+                    val adminUser = User()
                     adminUser.email = adminUserRequest.get().email
                     adminUser.password = adminUserRequest.get().password
                     adminUser.role = Role.ADMIN
@@ -172,7 +172,7 @@ class UserServiceImpl(
 
     @Transactional
     override fun denyRegisterAdmin(userDetails: UserDetailsImpl, id: Long): ManageRegisterAdminResponseDto {
-        var res = ManageRegisterAdminResponseDto()
+        val res = ManageRegisterAdminResponseDto()
         if (Objects.isNull(userDetails.getUser())){
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
@@ -181,7 +181,7 @@ class UserServiceImpl(
                 res.code = HttpServletResponse.SC_FORBIDDEN
                 res.msg = "권한이 부족합니다."
             } else {
-                var adminUserRequest = adminUserRequestRepository.findById(id)
+                val adminUserRequest = adminUserRequestRepository.findById(id)
                 if (!adminUserRequestRepository.existsById(id)){
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "존재하지 않는 요청 ID입니다."

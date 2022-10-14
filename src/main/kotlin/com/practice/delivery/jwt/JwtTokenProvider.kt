@@ -32,7 +32,7 @@ class JwtTokenProvider(private var userDetailsService: UserDetailsService) {
     fun createToken(username: String, id: Long): String {
         val claims: Claims = Jwts.claims().setSubject(username)
         claims["userid"] = id.toString()
-        val now: Date = Date()
+        val now = Date()
         return Jwts.builder()
             .setClaims(claims)
             .setIssuedAt(now)
@@ -46,7 +46,7 @@ class JwtTokenProvider(private var userDetailsService: UserDetailsService) {
     }
 
     fun getAuthentication(token: String): Authentication {
-        var userDetails: UserDetails = userDetailsService.loadUserByUsername(this.getUsername(token))
+        val userDetails: UserDetails = userDetailsService.loadUserByUsername(this.getUsername(token))
         return UsernamePasswordAuthenticationToken(userDetails, "", userDetails.authorities)
     }
 
@@ -57,7 +57,7 @@ class JwtTokenProvider(private var userDetailsService: UserDetailsService) {
 
     fun validToken(token: String): Boolean {
         try {
-            var claim: Jws<Claims> = Jwts.parser().setSigningKey(secretJwtKey).parseClaimsJws(token)
+            val claim: Jws<Claims> = Jwts.parser().setSigningKey(secretJwtKey).parseClaimsJws(token)
             return !claim.body.expiration.before(Date())
         } catch (e: Exception) {
             return false

@@ -29,7 +29,7 @@ class CouponServiceImpl(
         req: CreateCouponRequestDto,
         bindingResult: BindingResult
     ): CreateCouponResponseDto {
-        var res = CreateCouponResponseDto()
+        val res = CreateCouponResponseDto()
         if ("ADMIN" !in userDetails.getUser().getAuthorities()) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
@@ -38,7 +38,7 @@ class CouponServiceImpl(
                 res.code = HttpServletResponse.SC_BAD_REQUEST
                 res.msg = bindingResult.allErrors[0].defaultMessage!!
             } else {
-                var coupon = MasterCoupon(
+                val coupon = MasterCoupon(
                     req.discountRate,
                     req.discountPrice,
                     req.minSpend,
@@ -58,7 +58,7 @@ class CouponServiceImpl(
 
     @Transactional
     override fun couponIssuance(userDetails: UserDetailsImpl, id: Long): DefaultResponseDto {
-        var res = DefaultResponseDto()
+        val res = DefaultResponseDto()
         if ("DEFAULT" != userDetails.getUser().getAuth()) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
@@ -67,7 +67,7 @@ class CouponServiceImpl(
                 res.code = HttpServletResponse.SC_BAD_REQUEST
                 res.msg = "존재하지 않는 쿠폰 ID입니다."
             } else {
-                var masterCoupon = masterCouponRepository.findById(id).get()
+                val masterCoupon = masterCouponRepository.findById(id).get()
                 if (couponIssuanceLogRepository.existsByUserAndMasterCoupon(
                         userDetails.getUser(),
                         masterCoupon
@@ -76,7 +76,7 @@ class CouponServiceImpl(
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "이미 발급 받은 쿠폰입니다."
                 } else {
-                    var coupon = Coupon(masterCoupon,userDetails.getUser())
+                    val coupon = Coupon(masterCoupon,userDetails.getUser())
                     couponRepository.save(coupon)
                     masterCoupon.issuanceCoupon()
                     res.code = HttpServletResponse.SC_OK

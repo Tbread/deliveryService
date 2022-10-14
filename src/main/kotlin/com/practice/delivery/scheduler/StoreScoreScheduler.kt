@@ -13,13 +13,11 @@ class StoreScoreScheduler(
     private var storeRepository: StoreRepository
 ) {
 
-    val SCORE_INFO = "SCORE_INFO"
-
     @Scheduled(cron = "0 0 00 * * ?")
     @Transactional
     @Async
     fun updateScore(){
-        var storeList = storeRepository.findAll()
+        val storeList = storeRepository.findAll()
         for (store in storeList){
             store.updateScore(qReviewRepository.calculateScore(store).toFloat())
         }

@@ -41,7 +41,7 @@ class User : Timestamped() {
     }
 
     fun getAuthorities(): List<String>{
-        var authoritiesList = arrayListOf<String>()
+        val authoritiesList = arrayListOf<String>()
         when (this.role) {
             Role.SUPERIOR_ADMIN -> {
                 authoritiesList.add(Role.SUPERIOR_ADMIN.toString())

@@ -28,7 +28,7 @@ class StoreServiceImpl(
         req: RegisterStoreRequestDto,
         bindingResult: BindingResult
     ): RegisterStoreResponseDto {
-        var res = RegisterStoreResponseDto()
+        val res = RegisterStoreResponseDto()
         if (Objects.isNull(userDetails.getUser())) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
@@ -49,7 +49,7 @@ class StoreServiceImpl(
                         res.code = HttpServletResponse.SC_BAD_REQUEST
                         res.msg = bindingResult.allErrors[0].defaultMessage
                     } else {
-                        var registerRequest = StoreRegisterRequest()
+                        val registerRequest = StoreRegisterRequest()
                         registerRequest.owner = userDetails.getUser()
                         registerRequest.storeName = req.storeName!!
                         registerRequest.storeDesc = req.storeDesc
@@ -72,7 +72,7 @@ class StoreServiceImpl(
     }
 
     override fun viewRegisterStoreRequestList(userDetails: UserDetailsImpl): ViewRegisterStoreRequestListResponseDto {
-        var res = ViewRegisterStoreRequestListResponseDto()
+        val res = ViewRegisterStoreRequestListResponseDto()
         if (Objects.isNull(userDetails.getUser())) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
@@ -81,11 +81,11 @@ class StoreServiceImpl(
                 res.code = HttpServletResponse.SC_FORBIDDEN
                 res.msg = "권한이 부족합니다."
             } else {
-                var storeRegisterRequestList =
+                val storeRegisterRequestList =
                     storeRegisterRequestRepository.findByStatus(StoreRegisterRequest.Status.AWAIT)
-                var simpleRequestList = arrayListOf<SimpleRegisterStoreRequest>()
+                val simpleRequestList = arrayListOf<SimpleRegisterStoreRequest>()
                 for (request in storeRegisterRequestList) {
-                    var simpleRequest = SimpleRegisterStoreRequest(request)
+                    val simpleRequest = SimpleRegisterStoreRequest(request)
                     simpleRequestList.add(simpleRequest)
                 }
                 res.code = HttpServletResponse.SC_OK
@@ -98,7 +98,7 @@ class StoreServiceImpl(
 
     @Transactional
     override fun acceptRegisterStoreRequest(userDetails: UserDetailsImpl, id: Long): ManageRegisterStoreResponseDto {
-        var res = ManageRegisterStoreResponseDto()
+        val res = ManageRegisterStoreResponseDto()
         if (Objects.isNull(userDetails.getUser())) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
@@ -107,12 +107,12 @@ class StoreServiceImpl(
                 res.code = HttpServletResponse.SC_FORBIDDEN
                 res.msg = "권한이 부족합니다."
             } else {
-                var storeRequest = storeRegisterRequestRepository.findById(id)
+                val storeRequest = storeRegisterRequestRepository.findById(id)
                 if (!storeRegisterRequestRepository.existsById(id)) {
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "존재하지 않는 요청 ID입니다."
                 } else {
-                    var store = Store()
+                    val store = Store()
                     store.storeName = storeRequest.get().storeName
                     store.storeDesc = storeRequest.get().storeDesc
                     store.storeImgSrc = storeRequest.get().storeImgSrc
@@ -135,7 +135,7 @@ class StoreServiceImpl(
 
     @Transactional
     override fun denyRegisterStoreRequest(userDetails: UserDetailsImpl, id: Long): ManageRegisterStoreResponseDto {
-        var res = ManageRegisterStoreResponseDto()
+        val res = ManageRegisterStoreResponseDto()
         if (Objects.isNull(userDetails.getUser())) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
@@ -144,7 +144,7 @@ class StoreServiceImpl(
                 res.code = HttpServletResponse.SC_FORBIDDEN
                 res.msg = "권한이 부족합니다."
             } else {
-                var storeRequest = storeRegisterRequestRepository.findById(id)
+                val storeRequest = storeRegisterRequestRepository.findById(id)
                 if (!storeRegisterRequestRepository.existsById(id)) {
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "존재하지 않는 요청 ID입니다."

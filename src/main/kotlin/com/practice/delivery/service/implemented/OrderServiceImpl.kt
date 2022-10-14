@@ -32,7 +32,7 @@ class OrderServiceImpl(
         req: OrderRequestDto,
         bindingResult: BindingResult
     ): DefaultResponseDto {
-        var res = DefaultResponseDto()
+        val res = DefaultResponseDto()
         if (userDetails.getUser().getAuth() != "DEFAULT") {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
@@ -45,10 +45,10 @@ class OrderServiceImpl(
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "주문한 메뉴와 메뉴의 주문 개수 리스트가 맞지 않습니다."
                 } else {
-                    var menuList = arrayListOf<Menu>()
-                    var mainMenuSet = hashSetOf<Long>()
-                    var storeSet = hashSetOf<Store>()
-                    var necessaryMainSet = hashSetOf<Long>()
+                    val menuList = arrayListOf<Menu>()
+                    val mainMenuSet = hashSetOf<Long>()
+                    val storeSet = hashSetOf<Store>()
+                    val necessaryMainSet = hashSetOf<Long>()
                     for (menuId in req.menuList) {
                         if (!menuRepository.existsById(menuId)) {
                             //존재하지 않는 메뉴 ID가 포함됨
@@ -56,7 +56,7 @@ class OrderServiceImpl(
                             res.msg = "존재하지 않는 메뉴 ID입니다."
                             return res
                         }
-                        var menu = menuRepository.findById(menuId).get()
+                        val menu = menuRepository.findById(menuId).get()
                         if (menu.thisIsSoldOut) {
                             //품절 메뉴가 포함됨
                             res.code = HttpServletResponse.SC_BAD_REQUEST
@@ -108,21 +108,21 @@ class OrderServiceImpl(
                             }
                         }
                         //메인 주문 로직
-                        var deliveryOrder = DeliveryOrder()
+                        val deliveryOrder = DeliveryOrder()
                         deliveryOrder.orderer = userDetails.getUser()
-                        var orderedMenuList = arrayListOf<OrderedMenu>()
-                        var priceList = ArrayList<Int>()
+                        val orderedMenuList = arrayListOf<OrderedMenu>()
+                        val priceList = ArrayList<Int>()
                         for (i: Int in 0 until menuList.size) {
                             priceList.add(menuList[i].price * req.quantityList[i])
-                            var orderedMenu = OrderedMenu()
+                            val orderedMenu = OrderedMenu()
                             orderedMenu.menu = menuList[i]
                             orderedMenu.quantity = req.quantityList[i]
                             orderedMenuList.add(orderedMenu)
                         }
-                        var initialPrice: Int = priceList.sum()
+                        val initialPrice: Int = priceList.sum()
                         deliveryOrder.initialPrice = initialPrice
-                        var finalPrice: Int = 0
-                        var discounted: Int = 0
+                        val finalPrice: Int
+                        var discounted = 0
                         if (Objects.nonNull(coupon)) {
                             //입력된 쿠폰이 있을경우
                             if (coupon!!.masterCoupon!!.minSpend > initialPrice) {
@@ -131,9 +131,9 @@ class OrderServiceImpl(
                                 res.msg = "쿠폰의 최소 사용금액 이상 주문에만 사용할 수 있습니다."
                                 return res
                             }
-                            if (coupon!!.masterCoupon!!.discountPrice != 0) {
+                            if (coupon.masterCoupon!!.discountPrice != 0) {
                                 //절대할인형 쿠폰인경우
-                                finalPrice = initialPrice - coupon.masterCoupon!!.discountPrice
+                                discounted = initialPrice - coupon.masterCoupon!!.discountPrice
                             } else {
                                 //퍼센트할인형 쿠폰인경우
                                 discounted = initialPrice * (coupon.masterCoupon!!.discountRate / 100)
@@ -165,13 +165,13 @@ class OrderServiceImpl(
 
     override fun viewOrderList(userDetails: UserDetailsImpl): ViewOrderListResponseDto {
         //Dto 에서 status 를 받아서 해당 status 만 불러오도록 하는게 나을지도?
-        var res = ViewOrderListResponseDto()
-        var simpleOrderList = arrayListOf<SimpleOrder>()
+        val res = ViewOrderListResponseDto()
+        val simpleOrderList = arrayListOf<SimpleOrder>()
         if ("BUSINESS" !in userDetails.getUser().getAuthorities()) {
             //일반 유저 로직
-            var orderList = orderRepository.findByOrderer(userDetails.getUser())
+            val orderList = orderRepository.findByOrderer(userDetails.getUser())
             for (order in orderList) {
-                var simpleOrder = orderToSimpleOrder(order, false)
+                val simpleOrder = orderToSimpleOrder(order, false)
                 simpleOrderList.add(simpleOrder)
             }
             res.code = HttpServletResponse.SC_OK
@@ -183,9 +183,9 @@ class OrderServiceImpl(
                 res.code = HttpServletResponse.SC_BAD_REQUEST
                 res.msg = "소유중인 가게가 존재하지 않습니다."
             } else {
-                var orderList = orderRepository.findByStore(storeRepository.findByOwner(userDetails.getUser())!!)
+                val orderList = orderRepository.findByStore(storeRepository.findByOwner(userDetails.getUser())!!)
                 for (order in orderList) {
-                    var simpleOrder = orderToSimpleOrder(order, true)
+                    val simpleOrder = orderToSimpleOrder(order, true)
                     simpleOrderList.add(simpleOrder)
                 }
                 res.code = HttpServletResponse.SC_OK
@@ -198,7 +198,7 @@ class OrderServiceImpl(
 
     @Transactional
     override fun acceptOrder(userDetails: UserDetailsImpl, id: Long): ManageOrderResponseDto {
-        var res = ManageOrderResponseDto()
+        val res = ManageOrderResponseDto()
         if ("BUSINESS" !in userDetails.getUser().getAuthorities()) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
@@ -211,7 +211,7 @@ class OrderServiceImpl(
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "존재하지 않는 주문 ID입니다."
                 } else {
-                    var order = orderRepository.findById(id).get()
+                    val order = orderRepository.findById(id).get()
                     if (order.store!!.owner != userDetails.getUser()) {
                         res.code = HttpServletResponse.SC_FORBIDDEN
                         res.msg = "권한이 부족합니다."
@@ -234,7 +234,7 @@ class OrderServiceImpl(
 
     @Transactional
     override fun denyOrder(userDetails: UserDetailsImpl, id: Long): ManageOrderResponseDto {
-        var res = ManageOrderResponseDto()
+        val res = ManageOrderResponseDto()
         if ("BUSINESS" !in userDetails.getUser().getAuthorities()) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
@@ -247,7 +247,7 @@ class OrderServiceImpl(
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "존재하지 않는 주문 ID입니다."
                 } else {
-                    var order = orderRepository.findById(id).get()
+                    val order = orderRepository.findById(id).get()
                     if (order.store!!.owner != userDetails.getUser()) {
                         res.code = HttpServletResponse.SC_FORBIDDEN
                         res.msg = "권한이 부족합니다."
@@ -279,7 +279,7 @@ class OrderServiceImpl(
         id: Long,
         req: UpdateOrderStatusRequestDto
     ): ManageOrderResponseDto {
-        var res = ManageOrderResponseDto()
+        val res = ManageOrderResponseDto()
         if ("BUSINESS" !in userDetails.getUser().getAuthorities() || "ADMIN" !in userDetails.getUser()
                 .getAuthorities()
         ) {
@@ -296,7 +296,7 @@ class OrderServiceImpl(
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "존재하지 않는 주문 ID입니다."
                 } else {
-                    var order = orderRepository.findById(id).get()
+                    val order = orderRepository.findById(id).get()
                     if ("ADMIN" !in userDetails.getUser()
                             .getAuthorities() && order.store!!.owner != userDetails.getUser()
                     ) {
@@ -330,14 +330,14 @@ class OrderServiceImpl(
     }
 
     fun orderToSimpleOrder(deliveryOrder: DeliveryOrder, isBusiness: Boolean): SimpleOrder {
-        var orderedMenuList = orderedMenuRepository.findByDeliveryOrder(deliveryOrder)
-        var menuNameList = arrayListOf<String>()
-        var quantityList = arrayListOf<Int>()
+        val orderedMenuList = orderedMenuRepository.findByDeliveryOrder(deliveryOrder)
+        val menuNameList = arrayListOf<String>()
+        val quantityList = arrayListOf<Int>()
         for (orderedMenu in orderedMenuList) {
             menuNameList.add(orderedMenu.menu!!.menuName)
             quantityList.add(orderedMenu.quantity)
         }
-        var simpleOrder = SimpleOrder()
+        val simpleOrder = SimpleOrder()
         simpleOrder.orderId = deliveryOrder.id
         simpleOrder.menuNameList = menuNameList
         simpleOrder.quantityList = quantityList
