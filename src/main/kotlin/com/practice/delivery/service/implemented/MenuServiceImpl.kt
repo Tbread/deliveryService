@@ -13,6 +13,7 @@ import com.practice.delivery.repository.MenuOptionRepository
 import com.practice.delivery.repository.MenuRepository
 import com.practice.delivery.repository.StoreRepository
 import com.practice.delivery.repository.dslrepository.QMenuOptionRepository
+import com.practice.delivery.repository.dslrepository.QMenuRepository
 import com.practice.delivery.service.MenuService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -25,7 +26,8 @@ class MenuServiceImpl(
     private var menuRepository: MenuRepository,
     private var menuOptionRepository: MenuOptionRepository,
     private var storeRepository: StoreRepository,
-    private var qMenuOptionRepository: QMenuOptionRepository
+    private var qMenuOptionRepository: QMenuOptionRepository,
+    private var qMenuRepository: QMenuRepository
 ) : MenuService {
 
     @Transactional
@@ -47,7 +49,7 @@ class MenuServiceImpl(
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "소유중인 가게가 존재하지 않습니다."
                 } else {
-                    if (bindingResult.hasErrors()){
+                    if (bindingResult.hasErrors()) {
                         res.code = HttpServletResponse.SC_BAD_REQUEST
                         res.msg = bindingResult.allErrors[0].defaultMessage
                     } else {
@@ -61,8 +63,8 @@ class MenuServiceImpl(
                         mainMenu.price = req.price!!
                         mainMenu.store = store
                         menuRepository.save(mainMenu)
-                        if (mainMenu.thisHasOption){
-                            for (subMenuRequest:OptionMenu in req.optionMenuList!!){
+                        if (mainMenu.thisHasOption) {
+                            for (subMenuRequest: OptionMenu in req.optionMenuList!!) {
                                 val subMenu = Menu()
                                 val menuOption = MenuOption()
                                 subMenu.menuName = subMenuRequest.name
@@ -77,7 +79,7 @@ class MenuServiceImpl(
                         }
                         res.code = HttpServletResponse.SC_OK
                         res.msg = "성공적으로 메뉴를 추가하였습니다."
-                        res.simpleMenu = SimpleMenu(mainMenu,req.optionMenuList)
+                        res.simpleMenu = SimpleMenu(mainMenu, req.optionMenuList)
                     }
                 }
             }
@@ -87,20 +89,20 @@ class MenuServiceImpl(
 
     override fun showMenuList(id: Long): ShowMenuResponseDto {
         val res = ShowMenuResponseDto()
-        if (!storeRepository.existsById(id)){
+        if (!storeRepository.existsById(id)) {
             res.code = HttpServletResponse.SC_BAD_REQUEST
             res.msg = "존재하지 않는 가게 ID입니다."
         } else {
-            val menuList = menuRepository.findByStoreAndThisIsOption(storeRepository.findById(id).get(),false)
+            val menuList = qMenuRepository.findMainMenuByStore(storeRepository.findById(id).get())
             val simpleMenuList = arrayListOf<SimpleMenu>()
-            for (topMenu:Menu in menuList){
+            for (topMenu: Menu in menuList) {
                 val menuOptionList = qMenuOptionRepository.findByMainMenu(topMenu)
                 val subMenuList = arrayListOf<OptionMenu>()
-                for (menuOption in menuOptionList){
+                for (menuOption in menuOptionList) {
                     val subMenu = OptionMenu(menuOption.subMenu!!)
                     subMenuList.add(subMenu)
                 }
-                simpleMenuList.add(SimpleMenu(topMenu,subMenuList))
+                simpleMenuList.add(SimpleMenu(topMenu, subMenuList))
             }
             res.code = HttpServletResponse.SC_OK
             res.msg = "성공적으로 불러왔습니다."
@@ -112,35 +114,35 @@ class MenuServiceImpl(
     @Transactional
     override fun removeMenu(userDetails: UserDetailsImpl, id: Long): DefaultResponseDto {
         val res = DefaultResponseDto()
-        if ("BUSINESS" !in userDetails.getUser().getAuthorities()){
+        if ("BUSINESS" !in userDetails.getUser().getAuthorities()) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
         } else {
             val selectedMenu = menuRepository.findById(id)
-            if (!menuRepository.existsById(id)){
+            if (!menuRepository.existsById(id)) {
                 res.code = HttpServletResponse.SC_BAD_REQUEST
                 res.msg = "존재하지 않는 메뉴 ID입니다."
             } else {
-                if (selectedMenu.get().store!!.owner != userDetails.getUser()){
+                if (selectedMenu.get().store!!.owner != userDetails.getUser()) {
                     res.code = HttpServletResponse.SC_FORBIDDEN
                     res.msg = "권한이 부족합니다."
                 } else {
-                    if (selectedMenu.get().thisIsOption){
+                    if (selectedMenu.get().thisIsOption) {
                         //옵션메뉴인 경우
                         val menuOption = menuOptionRepository.findBySubMenu(selectedMenu.get())
                         val topMenu = menuOption!!.topMenu
                         val menuOptionList = qMenuOptionRepository.findByMainMenu(topMenu!!)
-                        if (menuOptionList.size == 1){
+                        if (menuOptionList.size == 1) {
                             //해당메뉴 제거시 옵션메뉴가 전부 사라지는경우
                             topMenu.updateThisHasOption(false)
                         }
                         menuOptionRepository.delete(menuOption)
                     } else {
                         //메인메뉴인 경우
-                        if (selectedMenu.get().thisHasOption){
+                        if (selectedMenu.get().thisHasOption) {
                             //옵션메뉴가 존재하는경우
                             val menuOptionList = qMenuOptionRepository.findByMainMenu(selectedMenu.get())
-                            for (menuOption in menuOptionList){
+                            for (menuOption in menuOptionList) {
                                 val subMenu = menuOption.subMenu
                                 menuOptionRepository.delete(menuOption)
                                 menuRepository.delete(subMenu!!)
@@ -153,11 +155,16 @@ class MenuServiceImpl(
                 }
             }
         }
-       return res
+        return res
     }
 
     @Transactional
-    override fun updateMenu(userDetails: UserDetailsImpl, req: UpdateMenuRequestDto, id:Long,bindingResult: BindingResult): DefaultResponseDto {
+    override fun updateMenu(
+        userDetails: UserDetailsImpl,
+        req: UpdateMenuRequestDto,
+        id: Long,
+        bindingResult: BindingResult
+    ): DefaultResponseDto {
         val res = DefaultResponseDto()
         if ("BUSINESS" !in userDetails.getUser().getAuthorities()) {
             res.code = HttpServletResponse.SC_FORBIDDEN

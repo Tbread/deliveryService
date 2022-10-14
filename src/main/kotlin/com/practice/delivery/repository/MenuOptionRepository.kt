@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface MenuOptionRepository:JpaRepository<MenuOption,Long> {
 
     fun findBySubMenu(subMenu:Menu):MenuOption?
-    
+
 }
