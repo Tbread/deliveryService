@@ -8,6 +8,7 @@ import com.practice.delivery.dto.response.ViewOrderListResponseDto
 import com.practice.delivery.entity.*
 import com.practice.delivery.model.SimpleOrder
 import com.practice.delivery.repository.*
+import com.practice.delivery.repository.dslrepository.QOrderedMenuRepository
 import com.practice.delivery.service.OrderService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -23,7 +24,8 @@ class OrderServiceImpl(
     private var menuRepository: MenuRepository,
     private var menuOptionRepository: MenuOptionRepository,
     private var couponRepository: CouponRepository,
-    private var storeRepository: StoreRepository
+    private var storeRepository: StoreRepository,
+    private var qOrderedMenuRepository: QOrderedMenuRepository
 ) : OrderService {
 
     @Transactional
@@ -330,7 +332,7 @@ class OrderServiceImpl(
     }
 
     fun orderToSimpleOrder(deliveryOrder: DeliveryOrder, isBusiness: Boolean): SimpleOrder {
-        val orderedMenuList = orderedMenuRepository.findByDeliveryOrder(deliveryOrder)
+        val orderedMenuList = qOrderedMenuRepository.findByOrder(deliveryOrder)
         val menuNameList = arrayListOf<String>()
         val quantityList = arrayListOf<Int>()
         for (orderedMenu in orderedMenuList) {
