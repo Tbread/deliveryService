@@ -45,6 +45,7 @@ class ReviewServiceImpl(
                 } else {
                     val review = Review(userDetails.getUser(),order,req.content,req.imgSrc,req.score)
                     reviewRepository.save(review)
+                    order.createReview()
                     res.code = HttpServletResponse.SC_OK
                     res.msg = "성공적으로 리뷰를 작성하였습니다."
                     res.simpleReview = SimpleReview(review)
