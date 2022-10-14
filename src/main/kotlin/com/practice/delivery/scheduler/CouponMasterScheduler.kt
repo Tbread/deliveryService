@@ -2,8 +2,8 @@ package com.practice.delivery.scheduler
 
 import com.practice.delivery.entity.Coupon
 import com.practice.delivery.entity.MasterCoupon
-import com.practice.delivery.repository.MasterCouponRepository
 import com.practice.delivery.repository.dslrepository.QCouponRepository
+import com.practice.delivery.repository.dslrepository.QMasterCouponRepository
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -13,7 +13,7 @@ import java.time.LocalDate
 
 @Service
 class CouponScheduler(
-    private var masterCouponRepository: MasterCouponRepository,
+    private var qMasterCouponRepository: QMasterCouponRepository,
     private var qCouponRepository: QCouponRepository
 ) {
 
@@ -21,7 +21,7 @@ class CouponScheduler(
     @Transactional
     @Async
     fun expiringCoupon() {
-        val masterList = masterCouponRepository.findByExpired(false)
+        val masterList = qMasterCouponRepository.findByExpired(false)
         for (master:MasterCoupon in masterList){
             if (master.expiryDate!!.isBefore(LocalDate.now()) || master.quantity <= 0){
                 master.expiringMasterCoupon()
