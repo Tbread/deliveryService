@@ -105,7 +105,7 @@ class UserServiceImpl(
                     res.msg = "잘못된 이메일 또는 패스워드입니다."
                 } else {
                     val token = jwtTokenProvider.createToken(loadedUser.email, loadedUser.id)
-                    loadedUser.lastLoginDate = LocalDateTime.now()
+                    loadedUser.updateLoginDate()
                     res.code = HttpServletResponse.SC_OK
                     res.msg = "성공적으로 로그인 하였습니다."
                     res.token = token
