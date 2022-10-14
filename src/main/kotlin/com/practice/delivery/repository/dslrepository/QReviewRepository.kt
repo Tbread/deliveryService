@@ -1,7 +1,9 @@
 package com.practice.delivery.repository.dslrepository
 
 import com.practice.delivery.entity.QReview
+import com.practice.delivery.entity.Review
 import com.practice.delivery.entity.Store
+import com.practice.delivery.entity.User
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
@@ -17,6 +19,28 @@ class QReviewRepository(private val jpaQueryFactory: JPAQueryFactory) {
             .where(QReview.review.deleted.eq(false))
             .select(QReview.review.score.avg())
             .fetchFirst()
+    }
+
+    fun getLiveStoreReviewList(store:Store):List<Review>{
+        return jpaQueryFactory.selectFrom(QReview.review)
+            .where(QReview.review.store.eq(store))
+            .where(QReview.review.deleted.eq(false))
+            .join(QReview.review.store)
+            .join(QReview.review.user)
+            .join(QReview.review.deliveryOrder)
+            .fetchJoin()
+            .fetch()
+    }
+
+    fun getLiveUserReviewList(user:User):List<Review>{
+        return jpaQueryFactory.selectFrom(QReview.review)
+            .where(QReview.review.user.eq(user))
+            .where(QReview.review.deleted.eq(false))
+            .join(QReview.review.store)
+            .join(QReview.review.user)
+            .join(QReview.review.deliveryOrder)
+            .fetchJoin()
+            .fetch()
     }
 
 }
