@@ -1,6 +1,8 @@
 package com.practice.delivery.service.implemented
 
 import com.practice.delivery.dto.request.RegisterStoreRequestDto
+import com.practice.delivery.dto.request.UpdateStoreRequestDto
+import com.practice.delivery.dto.response.DefaultResponseDto
 import com.practice.delivery.dto.response.ManageRegisterStoreResponseDto
 import com.practice.delivery.dto.response.RegisterStoreResponseDto
 import com.practice.delivery.dto.response.ViewRegisterStoreRequestListResponseDto
@@ -154,6 +156,38 @@ class StoreServiceImpl(
                     res.msg = "성공적으로 거절하였습니다."
                     res.simpleRegisterStoreRequest = SimpleRegisterStoreRequest(storeRequest.get())
                 }
+            }
+        }
+        return res
+    }
+
+    @Transactional
+    override fun updateStoreInfo(
+        userDetails: UserDetailsImpl,
+        req: UpdateStoreRequestDto,
+        bindingResult: BindingResult
+    ): DefaultResponseDto {
+        val res = DefaultResponseDto()
+        if ("BUSINESS" !in userDetails.getUser().getAuthorities()){
+            res.code = HttpServletResponse.SC_FORBIDDEN
+            res.msg = "권한이 부족합니다."
+        } else {
+            if (!storeRepository.existsByOwner(userDetails.getUser())){
+                res.code = HttpServletResponse.SC_BAD_REQUEST
+                res.msg = "소유중인 가게가 존재하지 않습니다."
+            } else {
+                val store = storeRepository.findByOwner(userDetails.getUser())
+                if (Objects.nonNull(req.desc)){
+                    store!!.updateStoreDesc(req.desc!!)
+                }
+                if (Objects.nonNull(req.imgSrc)){
+                    store!!.updateStoreImgSrc(req.imgSrc!!)
+                }
+                if (Objects.nonNull(req.minOrderPrice)){
+                    store!!.updateMinOrderPrice(req.minOrderPrice!!)
+                }
+                res.code = HttpServletResponse.SC_OK
+                res.msg = "성공적으로 정보를 수정했습니다."
             }
         }
         return res

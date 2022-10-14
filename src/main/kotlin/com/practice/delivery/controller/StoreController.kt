@@ -3,6 +3,7 @@ package com.practice.delivery.controller
 import com.practice.delivery.dto.request.AddMenuRequestDto
 import com.practice.delivery.dto.request.RegisterStoreRequestDto
 import com.practice.delivery.dto.request.UpdateMenuRequestDto
+import com.practice.delivery.dto.request.UpdateStoreRequestDto
 import com.practice.delivery.dto.response.*
 import com.practice.delivery.service.MenuService
 import com.practice.delivery.service.StoreService
@@ -90,5 +91,15 @@ class StoreController(private var storeService: StoreService, private var menuSe
         bindingResult: BindingResult
     ): DefaultResponseDto {
         return menuService.updateMenu(userDetails, req, id, bindingResult)
+    }
+
+    @Operation(summary = "가게 정보 업데이트 API", description = "헤더에 Authorization 으로 JWT 토큰을 요구합니다.")
+    @PatchMapping("/update-info")
+    fun updateStoreInfo(
+        @Parameter(hidden = true) @AuthenticationPrincipal userDetails: UserDetailsImpl,
+        @RequestBody @Valid req: UpdateStoreRequestDto,
+        bindingResult: BindingResult
+    ): DefaultResponseDto {
+        return storeService.updateStoreInfo(userDetails, req, bindingResult)
     }
 }
