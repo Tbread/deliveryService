@@ -11,7 +11,7 @@ import com.practice.delivery.entity.StoreRegisterRequest
 import com.practice.delivery.model.SimpleRegisterStoreRequest
 import com.practice.delivery.repository.StoreRegisterRequestRepository
 import com.practice.delivery.repository.StoreRepository
-import com.practice.delivery.repository.dslrepository.QStoreRegisterRequestRepository
+import com.practice.delivery.repository.dslRepository.QStoreRegisterRequestRepository
 import com.practice.delivery.service.StoreService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

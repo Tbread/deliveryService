@@ -9,7 +9,7 @@ import com.practice.delivery.model.SimpleReview
 import com.practice.delivery.repository.OrderRepository
 import com.practice.delivery.repository.ReviewRepository
 import com.practice.delivery.repository.StoreRepository
-import com.practice.delivery.repository.dslrepository.QReviewRepository
+import com.practice.delivery.repository.dslRepository.QReviewRepository
 import com.practice.delivery.service.ReviewService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

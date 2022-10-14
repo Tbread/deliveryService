@@ -13,7 +13,7 @@ import com.practice.delivery.jwt.JwtTokenProvider
 import com.practice.delivery.model.SimpleRegisterAdminRequest
 import com.practice.delivery.repository.AdminUserRequestRepository
 import com.practice.delivery.repository.UserRepository
-import com.practice.delivery.repository.dslrepository.QAdminUserRequestRepository
+import com.practice.delivery.repository.dslRepository.QAdminUserRequestRepository
 import com.practice.delivery.service.UserService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service

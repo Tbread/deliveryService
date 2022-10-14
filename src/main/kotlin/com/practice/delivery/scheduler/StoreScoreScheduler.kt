@@ -1,7 +1,7 @@
 package com.practice.delivery.scheduler
 
 import com.practice.delivery.repository.StoreRepository
-import com.practice.delivery.repository.dslrepository.QReviewRepository
+import com.practice.delivery.repository.dslRepository.QReviewRepository
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service

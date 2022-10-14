@@ -2,8 +2,8 @@ package com.practice.delivery.scheduler
 
 import com.practice.delivery.entity.Coupon
 import com.practice.delivery.entity.MasterCoupon
-import com.practice.delivery.repository.dslrepository.QCouponRepository
-import com.practice.delivery.repository.dslrepository.QMasterCouponRepository
+import com.practice.delivery.repository.dslRepository.QCouponRepository
+import com.practice.delivery.repository.dslRepository.QMasterCouponRepository
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service

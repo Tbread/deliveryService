@@ -12,8 +12,8 @@ import com.practice.delivery.model.SimpleMenu
 import com.practice.delivery.repository.MenuOptionRepository
 import com.practice.delivery.repository.MenuRepository
 import com.practice.delivery.repository.StoreRepository
-import com.practice.delivery.repository.dslrepository.QMenuOptionRepository
-import com.practice.delivery.repository.dslrepository.QMenuRepository
+import com.practice.delivery.repository.dslRepository.QMenuOptionRepository
+import com.practice.delivery.repository.dslRepository.QMenuRepository
 import com.practice.delivery.service.MenuService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

@@ -1,4 +1,4 @@
-package com.practice.delivery.repository.dslrepository
+package com.practice.delivery.repository.dslRepository
 
 import com.practice.delivery.entity.Menu
 import com.practice.delivery.entity.QMenu

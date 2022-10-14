@@ -8,8 +8,8 @@ import com.practice.delivery.dto.response.ViewOrderListResponseDto
 import com.practice.delivery.entity.*
 import com.practice.delivery.model.SimpleOrder
 import com.practice.delivery.repository.*
-import com.practice.delivery.repository.dslrepository.QOrderRepository
-import com.practice.delivery.repository.dslrepository.QOrderedMenuRepository
+import com.practice.delivery.repository.dslRepository.QOrderRepository
+import com.practice.delivery.repository.dslRepository.QOrderedMenuRepository
 import com.practice.delivery.service.OrderService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
