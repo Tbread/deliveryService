@@ -11,6 +11,7 @@ import com.practice.delivery.entity.StoreRegisterRequest
 import com.practice.delivery.model.SimpleRegisterStoreRequest
 import com.practice.delivery.repository.StoreRegisterRequestRepository
 import com.practice.delivery.repository.StoreRepository
+import com.practice.delivery.repository.dslrepository.QStoreRegisterRequestRepository
 import com.practice.delivery.service.StoreService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -21,7 +22,8 @@ import javax.servlet.http.HttpServletResponse
 @Service
 class StoreServiceImpl(
     private var storeRegisterRequestRepository: StoreRegisterRequestRepository,
-    private var storeRepository: StoreRepository
+    private var storeRepository: StoreRepository,
+    private var qStoreRegisterRequestRepository: QStoreRegisterRequestRepository
 ) : StoreService {
 
     @Transactional
@@ -73,7 +75,10 @@ class StoreServiceImpl(
         return res
     }
 
-    override fun viewRegisterStoreRequestList(userDetails: UserDetailsImpl): ViewRegisterStoreRequestListResponseDto {
+    override fun viewRegisterStoreRequestList(
+        userDetails: UserDetailsImpl,
+        statusCode: Int?
+    ): ViewRegisterStoreRequestListResponseDto {
         val res = ViewRegisterStoreRequestListResponseDto()
         if (Objects.isNull(userDetails.getUser())) {
             res.code = HttpServletResponse.SC_FORBIDDEN
@@ -83,8 +88,20 @@ class StoreServiceImpl(
                 res.code = HttpServletResponse.SC_FORBIDDEN
                 res.msg = "권한이 부족합니다."
             } else {
-                val storeRegisterRequestList =
-                    storeRegisterRequestRepository.findByStatus(StoreRegisterRequest.Status.AWAIT)
+                val storeRegisterRequestList: List<StoreRegisterRequest> = when (statusCode) {
+                    0 -> {
+                        qStoreRegisterRequestRepository.findByStatus(StoreRegisterRequest.Status.AWAIT)
+                    }
+                    1 -> {
+                        qStoreRegisterRequestRepository.findByStatus(StoreRegisterRequest.Status.ACCEPTED)
+                    }
+                    2 -> {
+                        qStoreRegisterRequestRepository.findByStatus(StoreRegisterRequest.Status.DENIED)
+                    }
+                    else -> {
+                        qStoreRegisterRequestRepository.findAll()
+                    }
+                }
                 val simpleRequestList = arrayListOf<SimpleRegisterStoreRequest>()
                 for (request in storeRegisterRequestList) {
                     val simpleRequest = SimpleRegisterStoreRequest(request)
@@ -168,22 +185,22 @@ class StoreServiceImpl(
         bindingResult: BindingResult
     ): DefaultResponseDto {
         val res = DefaultResponseDto()
-        if ("BUSINESS" !in userDetails.getUser().getAuthorities()){
+        if ("BUSINESS" !in userDetails.getUser().getAuthorities()) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
         } else {
-            if (!storeRepository.existsByOwner(userDetails.getUser())){
+            if (!storeRepository.existsByOwner(userDetails.getUser())) {
                 res.code = HttpServletResponse.SC_BAD_REQUEST
                 res.msg = "소유중인 가게가 존재하지 않습니다."
             } else {
                 val store = storeRepository.findByOwner(userDetails.getUser())
-                if (Objects.nonNull(req.desc)){
+                if (Objects.nonNull(req.desc)) {
                     store!!.updateStoreDesc(req.desc!!)
                 }
-                if (Objects.nonNull(req.imgSrc)){
+                if (Objects.nonNull(req.imgSrc)) {
                     store!!.updateStoreImgSrc(req.imgSrc!!)
                 }
-                if (Objects.nonNull(req.minOrderPrice)){
+                if (Objects.nonNull(req.minOrderPrice)) {
                     store!!.updateMinOrderPrice(req.minOrderPrice!!)
                 }
                 res.code = HttpServletResponse.SC_OK

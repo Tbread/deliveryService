@@ -18,4 +18,12 @@ class QStoreRegisterRequestRepository(private var jpaQueryFactory: JPAQueryFacto
             .fetch()
     }
 
+    fun findAll(): List<StoreRegisterRequest> {
+        return jpaQueryFactory.selectFrom(QStoreRegisterRequest.storeRegisterRequest)
+            .join(QStoreRegisterRequest.storeRegisterRequest.owner)
+            .join(QStoreRegisterRequest.storeRegisterRequest.approver)
+            .fetchJoin()
+            .fetch()
+    }
+
 }

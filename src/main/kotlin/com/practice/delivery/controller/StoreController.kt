@@ -32,10 +32,16 @@ class StoreController(private var storeService: StoreService, private var menuSe
         return storeService.registerStore(userDetails, req, bindingResult)
     }
 
-    @Operation(summary = "가게 등록 신청 리스트 조회 API", description = "헤더에 Authorization 으로 JWT 토큰을 요구합니다.")
+    @Operation(
+        summary = "가게 등록 신청 리스트 조회 API",
+        description = "statusCode: 0=대기중,1=수락됨,2=거절됨을 뜻합니다.<br />입력하지 않거나 잘못된 입력은 모든 정보를 가져옵니다.<br /> 헤더에 Authorization 으로 JWT 토큰을 요구합니다."
+    )
     @GetMapping("/register-store-request-list")
-    fun viewRegisterStoreList(@Parameter(hidden = true) @AuthenticationPrincipal userDetails: UserDetailsImpl): ViewRegisterStoreRequestListResponseDto {
-        return storeService.viewRegisterStoreRequestList(userDetails)
+    fun viewRegisterStoreList(
+        @Parameter(hidden = true) @AuthenticationPrincipal userDetails: UserDetailsImpl,
+        @RequestParam(required = false, value = "statusCode") statusCode: Int?
+    ): ViewRegisterStoreRequestListResponseDto {
+        return storeService.viewRegisterStoreRequestList(userDetails, statusCode)
     }
 
 

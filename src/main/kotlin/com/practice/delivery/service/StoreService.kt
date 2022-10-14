@@ -13,7 +13,7 @@ interface StoreService {
 
     fun registerStore(userDetails: UserDetailsImpl, req: RegisterStoreRequestDto, bindingResult: BindingResult):RegisterStoreResponseDto
 
-    fun viewRegisterStoreRequestList(userDetails: UserDetailsImpl): ViewRegisterStoreRequestListResponseDto
+    fun viewRegisterStoreRequestList(userDetails: UserDetailsImpl,statusCode:Int?): ViewRegisterStoreRequestListResponseDto
 
     fun acceptRegisterStoreRequest(userDetails: UserDetailsImpl, id:Long): ManageRegisterStoreResponseDto
 
