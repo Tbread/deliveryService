@@ -2,8 +2,8 @@ package com.practice.delivery.scheduler
 
 import com.practice.delivery.entity.Coupon
 import com.practice.delivery.entity.MasterCoupon
-import com.practice.delivery.repository.CouponRepository
 import com.practice.delivery.repository.MasterCouponRepository
+import com.practice.delivery.repository.dslrepository.QCouponRepository
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -13,8 +13,8 @@ import java.time.LocalDate
 
 @Service
 class CouponScheduler(
-    private var couponRepository: CouponRepository,
-    private var masterCouponRepository: MasterCouponRepository
+    private var masterCouponRepository: MasterCouponRepository,
+    private var qCouponRepository: QCouponRepository
 ) {
 
     @Scheduled(cron = "0 0 00 * * ?")
@@ -25,7 +25,7 @@ class CouponScheduler(
         for (master:MasterCoupon in masterList){
             if (master.expiryDate!!.isBefore(LocalDate.now()) || master.quantity <= 0){
                 master.expiringMasterCoupon()
-                val couponList = couponRepository.findByMasterCoupon(master)
+                val couponList = qCouponRepository.findByMasterCoupon(master)
                 for (coupon:Coupon in couponList){
                     coupon.expireCoupon()
                 }
