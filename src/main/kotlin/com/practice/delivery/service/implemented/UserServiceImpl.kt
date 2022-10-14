@@ -13,12 +13,12 @@ import com.practice.delivery.jwt.JwtTokenProvider
 import com.practice.delivery.model.SimpleRegisterAdminRequest
 import com.practice.delivery.repository.AdminUserRequestRepository
 import com.practice.delivery.repository.UserRepository
+import com.practice.delivery.repository.dslrepository.QAdminUserRequestRepository
 import com.practice.delivery.service.UserService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.BindingResult
-import java.time.LocalDateTime
 import java.util.*
 import javax.servlet.http.HttpServletResponse
 
@@ -28,7 +28,8 @@ class UserServiceImpl(
     private var passwordEncoder: BCryptPasswordEncoder,
     private var userRepository: UserRepository,
     private var jwtTokenProvider: JwtTokenProvider,
-    private var adminUserRequestRepository: AdminUserRequestRepository
+    private var adminUserRequestRepository: AdminUserRequestRepository,
+    private var qAdminUserRequestRepository: QAdminUserRequestRepository
 ) : UserService {
 
     @Transactional
@@ -70,7 +71,11 @@ class UserServiceImpl(
                 res.code = HttpServletResponse.SC_BAD_REQUEST
                 res.msg = "유효하지 않은 요청입니다."
             } else {
-                if (userRepository.existsByEmail(req.email!!) or adminUserRequestRepository.existsByEmailAndStatus(req.email,AdminUserRequest.Status.AWAIT)) {
+                if (userRepository.existsByEmail(req.email!!) or adminUserRequestRepository.existsByEmailAndStatus(
+                        req.email,
+                        AdminUserRequest.Status.AWAIT
+                    )
+                ) {
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "이미 존재하는 이메일입니다."
                 } else {
@@ -115,18 +120,34 @@ class UserServiceImpl(
         return res
     }
 
-    override fun viewRegisterAdminList(userDetails: UserDetailsImpl): ViewRegisterAdminRequestListResponseDto {
+    override fun viewRegisterAdminList(
+        userDetails: UserDetailsImpl,
+        statusCode: Int?
+    ): ViewRegisterAdminRequestListResponseDto {
         val res = ViewRegisterAdminRequestListResponseDto()
         if (Objects.isNull(userDetails.getUser())) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
         } else {
-            if ("SUPERIOR_ADMIN" !in userDetails.getUser().getAuthorities()){
+            if ("SUPERIOR_ADMIN" !in userDetails.getUser().getAuthorities()) {
                 res.code = HttpServletResponse.SC_FORBIDDEN
                 res.msg = "권한이 부족합니다."
             } else {
                 val simpleRegisterAdminRequestList = arrayListOf<SimpleRegisterAdminRequest>()
-                val adminUserRequestList = adminUserRequestRepository.findByStatus(AdminUserRequest.Status.AWAIT)
+                val adminUserRequestList:List<AdminUserRequest> = when (statusCode) {
+                    0 -> {
+                        qAdminUserRequestRepository.findAllByStatus(AdminUserRequest.Status.AWAIT)
+                    }
+                    1 -> {
+                        qAdminUserRequestRepository.findAllByStatus(AdminUserRequest.Status.ACCEPTED)
+                    }
+                    2 -> {
+                        qAdminUserRequestRepository.findAllByStatus(AdminUserRequest.Status.DENIED)
+                    }
+                    else -> {
+                        qAdminUserRequestRepository.findAll()
+                    }
+                }
                 for (adminUserRequest in adminUserRequestList) {
                     val simpleRegisterAdminRequest = SimpleRegisterAdminRequest(adminUserRequest)
                     simpleRegisterAdminRequestList.add(simpleRegisterAdminRequest)
@@ -142,16 +163,16 @@ class UserServiceImpl(
     @Transactional
     override fun acceptRegisterAdmin(userDetails: UserDetailsImpl, id: Long): ManageRegisterAdminResponseDto {
         val res = ManageRegisterAdminResponseDto()
-        if (Objects.isNull(userDetails.getUser())){
+        if (Objects.isNull(userDetails.getUser())) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
         } else {
-            if ("SUPERIOR_ADMIN" !in userDetails.getUser().getAuthorities()){
+            if ("SUPERIOR_ADMIN" !in userDetails.getUser().getAuthorities()) {
                 res.code = HttpServletResponse.SC_FORBIDDEN
                 res.msg = "권한이 부족합니다."
             } else {
                 val adminUserRequest = adminUserRequestRepository.findById(id)
-                if (!adminUserRequestRepository.existsById(id)){
+                if (!adminUserRequestRepository.existsById(id)) {
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "존재하지 않는 요청 ID입니다."
                 } else {
@@ -173,16 +194,16 @@ class UserServiceImpl(
     @Transactional
     override fun denyRegisterAdmin(userDetails: UserDetailsImpl, id: Long): ManageRegisterAdminResponseDto {
         val res = ManageRegisterAdminResponseDto()
-        if (Objects.isNull(userDetails.getUser())){
+        if (Objects.isNull(userDetails.getUser())) {
             res.code = HttpServletResponse.SC_FORBIDDEN
             res.msg = "권한이 부족합니다."
         } else {
-            if ("SUPERIOR_ADMIN" !in userDetails.getUser().getAuthorities()){
+            if ("SUPERIOR_ADMIN" !in userDetails.getUser().getAuthorities()) {
                 res.code = HttpServletResponse.SC_FORBIDDEN
                 res.msg = "권한이 부족합니다."
             } else {
                 val adminUserRequest = adminUserRequestRepository.findById(id)
-                if (!adminUserRequestRepository.existsById(id)){
+                if (!adminUserRequestRepository.existsById(id)) {
                     res.code = HttpServletResponse.SC_BAD_REQUEST
                     res.msg = "존재하지 않는 요청 ID입니다."
                 } else {

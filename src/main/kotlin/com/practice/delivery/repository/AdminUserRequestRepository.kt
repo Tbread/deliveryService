@@ -9,7 +9,6 @@ interface AdminUserRequestRepository:JpaRepository<AdminUserRequest,Long> {
 
     fun findByEmail(email:String):AdminUserRequest?
 
-    fun findByStatus(status: AdminUserRequest.Status):List<AdminUserRequest>
     fun existsByEmailAndStatus(email: String,status: AdminUserRequest.Status):Boolean
 
 }
