@@ -8,6 +8,7 @@ import com.practice.delivery.dto.response.ViewOrderListResponseDto
 import com.practice.delivery.entity.*
 import com.practice.delivery.model.SimpleOrder
 import com.practice.delivery.repository.*
+import com.practice.delivery.repository.dslrepository.QOrderRepository
 import com.practice.delivery.repository.dslrepository.QOrderedMenuRepository
 import com.practice.delivery.service.OrderService
 import org.springframework.stereotype.Service
@@ -25,7 +26,8 @@ class OrderServiceImpl(
     private var menuOptionRepository: MenuOptionRepository,
     private var couponRepository: CouponRepository,
     private var storeRepository: StoreRepository,
-    private var qOrderedMenuRepository: QOrderedMenuRepository
+    private var qOrderedMenuRepository: QOrderedMenuRepository,
+    private var qOrderRepository: QOrderRepository
 ) : OrderService {
 
     @Transactional
@@ -171,7 +173,7 @@ class OrderServiceImpl(
         val simpleOrderList = arrayListOf<SimpleOrder>()
         if ("BUSINESS" !in userDetails.getUser().getAuthorities()) {
             //일반 유저 로직
-            val orderList = orderRepository.findByOrderer(userDetails.getUser())
+            val orderList = qOrderRepository.findByOrderer(userDetails.getUser())
             for (order in orderList) {
                 val simpleOrder = orderToSimpleOrder(order, false)
                 simpleOrderList.add(simpleOrder)
@@ -185,7 +187,7 @@ class OrderServiceImpl(
                 res.code = HttpServletResponse.SC_BAD_REQUEST
                 res.msg = "소유중인 가게가 존재하지 않습니다."
             } else {
-                val orderList = orderRepository.findByStore(storeRepository.findByOwner(userDetails.getUser())!!)
+                val orderList = qOrderRepository.findByStore(storeRepository.findByOwner(userDetails.getUser())!!)
                 for (order in orderList) {
                     val simpleOrder = orderToSimpleOrder(order, true)
                     simpleOrderList.add(simpleOrder)
