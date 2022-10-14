@@ -32,7 +32,7 @@ class OrderController(private var orderService: OrderService) {
 
     @Operation(
         summary = "주문 조회 API",
-        description = "일반 유저의 경우엔 자신의 주문 기록을 출력하며 사업자의 경우에는 자신의 가게에 할당된 주문을 조회합니다.\n헤더에 Authorization 으로 JWT 토큰을 요구합니다."
+        description = "일반 유저의 경우엔 자신의 주문 기록을 출력하며 사업자의 경우에는 자신의 가게에 할당된 주문을 조회합니다.<br />헤더에 Authorization 으로 JWT 토큰을 요구합니다."
     )
     @GetMapping("/view-list")
     fun viewOrderList(@Parameter(hidden = true) @AuthenticationPrincipal userDetails: UserDetailsImpl): ViewOrderListResponseDto {
@@ -59,7 +59,7 @@ class OrderController(private var orderService: OrderService) {
 
     @Operation(
         summary = "주문 상태 업데이트 API",
-        description = "주문의 상태를 업데이트합니다. 이미 취소된 주문건의 수정은 관리자만 가능합니다.\n헤더에 Authorization 으로 JWT 토큰을 요구합니다."
+        description = "주문의 상태를 업데이트합니다. 이미 취소된 주문건의 수정은 관리자만 가능합니다.<br />헤더에 Authorization 으로 JWT 토큰을 요구합니다."
     )
     @PostMapping("/update-status/{id}")
     fun updateOrderProgress(

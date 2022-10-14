@@ -40,7 +40,7 @@ class ReviewController(private var reviewService: ReviewService) {
 
     @Operation(
         summary = "리뷰 리스트 조회 API",
-        description = "일반 유저라면 자신이 작성한 리뷰 리스트를, 사업자 유저라면 자신의 가게에 작성된 리뷰 리스트를 불러옵니다.\n 헤더에 Authorization 으로 JWT 토큰을 요구합니다."
+        description = "일반 유저라면 자신이 작성한 리뷰 리스트를, 사업자 유저라면 자신의 가게에 작성된 리뷰 리스트를 불러옵니다.<br />헤더에 Authorization 으로 JWT 토큰을 요구합니다."
     )
     @GetMapping("/view")
     fun viewReviewList(@Parameter(hidden = true) @AuthenticationPrincipal userDetails: UserDetailsImpl): ViewReviewListResponseDto {

@@ -20,7 +20,7 @@ class CouponController(private var couponService: CouponService) {
 
     @Operation(
         summary = "쿠폰 등록 API",
-        description = "새로운 쿠폰을 정의하여 등록합니다. 해당 쿠폰은 만료일자까지 또는 정해진 수량만큼 쿠폰 발급 API 를 통해 받을 수 있습니다.\n헤더에 Authorization 으로 JWT 토큰을 요구합니다."
+        description = "새로운 쿠폰을 정의하여 등록합니다. 해당 쿠폰은 만료일자까지 또는 정해진 수량만큼 쿠폰 발급 API 를 통해 받을 수 있습니다.<br />헤더에 Authorization 으로 JWT 토큰을 요구합니다."
     )
     @PostMapping("/create")
     fun createCoupon(
@@ -31,7 +31,7 @@ class CouponController(private var couponService: CouponService) {
         return couponService.createCoupon(userDetails, req, bindingResult)
     }
 
-    @Operation(summary = "쿠폰 발급 API", description = "쿠폰 등록 API 를 통해 등록된 쿠폰을 1회 발급 받을 수 있습니다.\n헤더에 Authorization 으로 JWT 토큰을 요구합니다.")
+    @Operation(summary = "쿠폰 발급 API", description = "쿠폰 등록 API 를 통해 등록된 쿠폰을 1회 발급 받을 수 있습니다.<br />헤더에 Authorization 으로 JWT 토큰을 요구합니다.")
     @GetMapping("/issuance/{id}")
     fun issuanceCoupon(
         @Parameter(hidden = true) @AuthenticationPrincipal userDetails: UserDetailsImpl,
