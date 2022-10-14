@@ -8,7 +8,6 @@ import com.practice.delivery.entity.*
 import com.practice.delivery.jwt.JwtTokenProvider
 import com.practice.delivery.model.OptionMenu
 import com.practice.delivery.repository.*
-import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test

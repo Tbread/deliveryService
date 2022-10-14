@@ -2,13 +2,7 @@ package com.practice.delivery.entity
 
 import com.practice.delivery.utils.Timestamped
 import java.time.LocalDate
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
+import javax.persistence.*
 
 @Entity
 class MasterCoupon:Timestamped {
