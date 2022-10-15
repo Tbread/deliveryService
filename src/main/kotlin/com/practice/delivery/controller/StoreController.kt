@@ -108,4 +108,10 @@ class StoreController(private var storeService: StoreService, private var menuSe
     ): DefaultResponseDto {
         return storeService.updateStoreInfo(userDetails, req, bindingResult)
     }
+
+    @Operation(summary = "가게 찜 목록 추가 API", description = "헤더에 Authorization 으로 JWT 토큰을 요구합니다.")
+    @GetMapping("/add-favor/{id}")
+    fun addFavorStore(@Parameter(hidden = true) @AuthenticationPrincipal userDetails: UserDetailsImpl,@PathVariable id:Long):DefaultResponseDto{
+        return storeService.addFavorStore(userDetails,id)
+    }
 }

@@ -11,13 +11,26 @@ import org.springframework.validation.BindingResult
 
 interface StoreService {
 
-    fun registerStore(userDetails: UserDetailsImpl, req: RegisterStoreRequestDto, bindingResult: BindingResult):RegisterStoreResponseDto
+    fun registerStore(
+        userDetails: UserDetailsImpl,
+        req: RegisterStoreRequestDto,
+        bindingResult: BindingResult
+    ): RegisterStoreResponseDto
 
-    fun viewRegisterStoreRequestList(userDetails: UserDetailsImpl,statusCode:Int?): ViewRegisterStoreRequestListResponseDto
+    fun viewRegisterStoreRequestList(
+        userDetails: UserDetailsImpl,
+        statusCode: Int?
+    ): ViewRegisterStoreRequestListResponseDto
 
-    fun acceptRegisterStoreRequest(userDetails: UserDetailsImpl, id:Long): ManageRegisterStoreResponseDto
+    fun acceptRegisterStoreRequest(userDetails: UserDetailsImpl, id: Long): ManageRegisterStoreResponseDto
 
-    fun denyRegisterStoreRequest(userDetails: UserDetailsImpl, id:Long):ManageRegisterStoreResponseDto
+    fun denyRegisterStoreRequest(userDetails: UserDetailsImpl, id: Long): ManageRegisterStoreResponseDto
 
-    fun updateStoreInfo(userDetails: UserDetailsImpl,req:UpdateStoreRequestDto,bindingResult: BindingResult):DefaultResponseDto
+    fun updateStoreInfo(
+        userDetails: UserDetailsImpl,
+        req: UpdateStoreRequestDto,
+        bindingResult: BindingResult
+    ): DefaultResponseDto
+
+    fun addFavorStore(userDetails: UserDetailsImpl, id: Long): DefaultResponseDto
 }

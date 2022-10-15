@@ -6,9 +6,11 @@ import com.practice.delivery.dto.response.DefaultResponseDto
 import com.practice.delivery.dto.response.ManageRegisterStoreResponseDto
 import com.practice.delivery.dto.response.RegisterStoreResponseDto
 import com.practice.delivery.dto.response.ViewRegisterStoreRequestListResponseDto
+import com.practice.delivery.entity.FavorStore
 import com.practice.delivery.entity.Store
 import com.practice.delivery.entity.StoreRegisterRequest
 import com.practice.delivery.model.SimpleRegisterStoreRequest
+import com.practice.delivery.repository.FavorStoreRepository
 import com.practice.delivery.repository.StoreRegisterRequestRepository
 import com.practice.delivery.repository.StoreRepository
 import com.practice.delivery.repository.dslRepository.QStoreRegisterRequestRepository
@@ -23,7 +25,8 @@ import javax.servlet.http.HttpServletResponse
 class StoreServiceImpl(
     private var storeRegisterRequestRepository: StoreRegisterRequestRepository,
     private var storeRepository: StoreRepository,
-    private var qStoreRegisterRequestRepository: QStoreRegisterRequestRepository
+    private var qStoreRegisterRequestRepository: QStoreRegisterRequestRepository,
+    private var favorStoreRepository: FavorStoreRepository
 ) : StoreService {
 
     @Transactional
@@ -205,6 +208,26 @@ class StoreServiceImpl(
                 }
                 res.code = HttpServletResponse.SC_OK
                 res.msg = "성공적으로 정보를 수정했습니다."
+            }
+        }
+        return res
+    }
+
+    @Transactional
+    override fun addFavorStore(userDetails: UserDetailsImpl,id:Long): DefaultResponseDto {
+        val res = DefaultResponseDto()
+        if (!storeRepository.existsById(id)){
+            res.code = HttpServletResponse.SC_BAD_REQUEST
+            res.msg = "존재하지 않는 가게 ID입니다."
+        } else {
+            if (favorStoreRepository.existsByUserAndStore(userDetails.getUser(),storeRepository.findById(id).get())){
+                res.code = HttpServletResponse.SC_BAD_REQUEST
+                res.msg = "이미 등록된 가게입니다."
+            } else {
+                val favorStore = FavorStore(userDetails.getUser(),storeRepository.findById(id).get())
+                favorStoreRepository.save(favorStore)
+                res.code = HttpServletResponse.SC_OK
+                res.msg = "성공적으로 등록하였습니다."
             }
         }
         return res
