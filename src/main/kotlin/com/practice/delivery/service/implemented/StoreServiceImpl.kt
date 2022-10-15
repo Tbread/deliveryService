@@ -214,17 +214,20 @@ class StoreServiceImpl(
     }
 
     @Transactional
-    override fun addFavorStore(userDetails: UserDetailsImpl,id:Long): DefaultResponseDto {
+    override fun manageFavorStore(userDetails: UserDetailsImpl, id: Long): DefaultResponseDto {
         val res = DefaultResponseDto()
-        if (!storeRepository.existsById(id)){
+        if (!storeRepository.existsById(id)) {
             res.code = HttpServletResponse.SC_BAD_REQUEST
             res.msg = "존재하지 않는 가게 ID입니다."
         } else {
-            if (favorStoreRepository.existsByUserAndStore(userDetails.getUser(),storeRepository.findById(id).get())){
+            if (favorStoreRepository.existsByUserAndStore(userDetails.getUser(), storeRepository.findById(id).get())) {
+                val favorStore =
+                    favorStoreRepository.findByUserAndStore(userDetails.getUser(), storeRepository.findById(id).get())!!
+                favorStoreRepository.delete(favorStore)
                 res.code = HttpServletResponse.SC_BAD_REQUEST
-                res.msg = "이미 등록된 가게입니다."
+                res.msg = "성공적으로 삭제하였습니다."
             } else {
-                val favorStore = FavorStore(userDetails.getUser(),storeRepository.findById(id).get())
+                val favorStore = FavorStore(userDetails.getUser(), storeRepository.findById(id).get())
                 favorStoreRepository.save(favorStore)
                 res.code = HttpServletResponse.SC_OK
                 res.msg = "성공적으로 등록하였습니다."

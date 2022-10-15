@@ -32,5 +32,5 @@ interface StoreService {
         bindingResult: BindingResult
     ): DefaultResponseDto
 
-    fun addFavorStore(userDetails: UserDetailsImpl, id: Long): DefaultResponseDto
+    fun manageFavorStore(userDetails: UserDetailsImpl, id: Long): DefaultResponseDto
 }
