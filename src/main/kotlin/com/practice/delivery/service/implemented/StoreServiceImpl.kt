@@ -2,17 +2,16 @@ package com.practice.delivery.service.implemented
 
 import com.practice.delivery.dto.request.RegisterStoreRequestDto
 import com.practice.delivery.dto.request.UpdateStoreRequestDto
-import com.practice.delivery.dto.response.DefaultResponseDto
-import com.practice.delivery.dto.response.ManageRegisterStoreResponseDto
-import com.practice.delivery.dto.response.RegisterStoreResponseDto
-import com.practice.delivery.dto.response.ViewRegisterStoreRequestListResponseDto
+import com.practice.delivery.dto.response.*
 import com.practice.delivery.entity.FavorStore
 import com.practice.delivery.entity.Store
 import com.practice.delivery.entity.StoreRegisterRequest
 import com.practice.delivery.model.SimpleRegisterStoreRequest
+import com.practice.delivery.model.SimpleStore
 import com.practice.delivery.repository.FavorStoreRepository
 import com.practice.delivery.repository.StoreRegisterRequestRepository
 import com.practice.delivery.repository.StoreRepository
+import com.practice.delivery.repository.dslRepository.QFavorStoreRepository
 import com.practice.delivery.repository.dslRepository.QStoreRegisterRequestRepository
 import com.practice.delivery.service.StoreService
 import org.springframework.stereotype.Service
@@ -26,7 +25,8 @@ class StoreServiceImpl(
     private var storeRegisterRequestRepository: StoreRegisterRequestRepository,
     private var storeRepository: StoreRepository,
     private var qStoreRegisterRequestRepository: QStoreRegisterRequestRepository,
-    private var favorStoreRepository: FavorStoreRepository
+    private var favorStoreRepository: FavorStoreRepository,
+    private var qFavorStoreRepository: QFavorStoreRepository
 ) : StoreService {
 
     @Transactional
@@ -233,6 +233,20 @@ class StoreServiceImpl(
                 res.msg = "성공적으로 등록하였습니다."
             }
         }
+        return res
+    }
+
+    override fun viewFavorStoreList(userDetails: UserDetailsImpl): ViewFavorStoreResponseDto {
+        val res = ViewFavorStoreResponseDto()
+        val favorStoreList = qFavorStoreRepository.findByUser(userDetails.getUser())
+        val simpleStoreList = arrayListOf<SimpleStore>()
+        for (favorStore in favorStoreList) {
+            val simpleStore = SimpleStore(favorStore.store)
+            simpleStoreList.add(simpleStore)
+        }
+        res.code = HttpServletResponse.SC_OK
+        res.msg = "성공적으로 불러왔습니다."
+        res.simpleStoreList = simpleStoreList
         return res
     }
 
