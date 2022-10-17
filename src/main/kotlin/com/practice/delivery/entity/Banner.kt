@@ -34,4 +34,8 @@ class Banner {
         this.expired = false
         this.expireDate = expireDate
     }
+
+    fun expireBanner(){
+        this.expired = true
+    }
 }
