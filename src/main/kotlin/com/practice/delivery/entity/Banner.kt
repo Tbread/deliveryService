@@ -1,5 +1,6 @@
 package com.practice.delivery.entity
 
+import java.time.LocalDate
 import javax.persistence.*
 
 @Entity
@@ -19,10 +20,18 @@ class Banner {
     @JoinColumn
     var user:User
 
+    @Column(nullable = false)
+    var expired:Boolean
 
-    constructor(imgSrc:String,src:String,user: User){
+    @Column(nullable = false)
+    var expireDate:LocalDate
+
+
+    constructor(imgSrc:String,src:String,user: User,expireDate:LocalDate){
         this.imgSrc = imgSrc
         this.src = src
         this.user = user
+        this.expired = false
+        this.expireDate = expireDate
     }
 }
