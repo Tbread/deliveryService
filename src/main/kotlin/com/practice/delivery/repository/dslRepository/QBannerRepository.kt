@@ -26,4 +26,19 @@ class QBannerRepository(private var jpaQueryFactory: JPAQueryFactory) {
             .fetch()
     }
 
+    fun getDeadBannerList(): List<Banner> {
+        return jpaQueryFactory.selectFrom(QBanner.banner)
+            .where(QBanner.banner.expired.eq(true))
+            .join(QBanner.banner.user)
+            .fetchJoin()
+            .fetch()
+    }
+
+    fun getAll(): List<Banner> {
+        return jpaQueryFactory.selectFrom(QBanner.banner)
+            .join(QBanner.banner.user)
+            .fetchJoin()
+            .fetch()
+    }
+
 }

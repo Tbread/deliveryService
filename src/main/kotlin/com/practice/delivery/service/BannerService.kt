@@ -17,6 +17,6 @@ interface BannerService {
 
     fun expireBanner(userDetails: UserDetailsImpl,id:Long):DefaultResponseDto
 
-    fun viewBannerList():ViewBannerListResponseDto
+    fun viewBannerList(statusCode:Int?):ViewBannerListResponseDto
 
 }

@@ -61,9 +61,19 @@ class BannerServiceImpl(
         return res
     }
 
-    override fun viewBannerList(): ViewBannerListResponseDto {
+    override fun viewBannerList(statusCode: Int?): ViewBannerListResponseDto {
         val res = ViewBannerListResponseDto()
-        val bannerList = qBannerRepository.getLiveBannerList()
+        val bannerList = when (statusCode) {
+            0 -> {
+                qBannerRepository.getLiveBannerList()
+            }
+            1 -> {
+                qBannerRepository.getDeadBannerList()
+            }
+            else -> {
+                qBannerRepository.getAll()
+            }
+        }
         val simpleBannerList = arrayListOf<SimpleBanner>()
         for (banner in bannerList) {
             val simpleBanner = SimpleBanner(banner)

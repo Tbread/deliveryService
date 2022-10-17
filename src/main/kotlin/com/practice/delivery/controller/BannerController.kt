@@ -44,10 +44,16 @@ class BannerController(private var bannerService: BannerService) {
     }
 
     @Operation(
-        summary = "배너 조회 API"
+        summary = "배너 조회 API",
+        description = "statusCode: 0=만료되지 않음,1=만료됨을 뜻합니다.<br />입력하지 않거나 잘못된 입력은 모든 정보를 가져옵니다."
     )
     @GetMapping("/view")
-    fun viewBannerList(): ViewBannerListResponseDto {
-        return bannerService.viewBannerList()
+    fun viewBannerList(
+        @RequestParam(
+            required = false,
+            value = "statusCode"
+        ) statusCode: Int?
+    ): ViewBannerListResponseDto {
+        return bannerService.viewBannerList(statusCode)
     }
 }
