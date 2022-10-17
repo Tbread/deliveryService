@@ -24,9 +24,9 @@ import javax.servlet.http.HttpServletResponse
 class StoreServiceImpl(
     private var storeRegisterRequestRepository: StoreRegisterRequestRepository,
     private var storeRepository: StoreRepository,
-    private var qStoreRegisterRequestRepository: QStoreRegisterRequestRepository,
     private var favorStoreRepository: FavorStoreRepository,
-    private var qFavorStoreRepository: QFavorStoreRepository
+    private var qFavorStoreRepository: QFavorStoreRepository,
+    private var qStoreRegisterRequestRepository: QStoreRegisterRequestRepository
 ) : StoreService {
 
     @Transactional
