@@ -12,4 +12,9 @@ interface BannerService {
         req: AddBannerRequestDto,
         bindingResult: BindingResult
     ): AddBannerResponseDto
+
+    fun expireBanner(userDetails: UserDetailsImpl,id:Long):Any
+
+    fun viewBannerList():Any
+
 }
