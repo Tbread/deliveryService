@@ -14,7 +14,7 @@ class BannerScheduler(private var qBannerRepository: QBannerRepository) {
     @Transactional
     @Async
     fun expireBanner() {
-        val bannerList = qBannerRepository.getLiveBannerList()
+        val bannerList = qBannerRepository.getLiveExpiredBannerList()
         for (banner in bannerList) {
             banner.expireBanner()
         }
