@@ -2,6 +2,8 @@ package com.practice.delivery.service
 
 import com.practice.delivery.dto.request.AddBannerRequestDto
 import com.practice.delivery.dto.response.AddBannerResponseDto
+import com.practice.delivery.dto.response.DefaultResponseDto
+import com.practice.delivery.dto.response.ViewBannerListResponseDto
 import com.practice.delivery.service.implemented.UserDetailsImpl
 import org.springframework.validation.BindingResult
 
@@ -13,8 +15,8 @@ interface BannerService {
         bindingResult: BindingResult
     ): AddBannerResponseDto
 
-    fun expireBanner(userDetails: UserDetailsImpl,id:Long):Any
+    fun expireBanner(userDetails: UserDetailsImpl,id:Long):DefaultResponseDto
 
-    fun viewBannerList():Any
+    fun viewBannerList():ViewBannerListResponseDto
 
 }
