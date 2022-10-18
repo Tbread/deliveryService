@@ -19,4 +19,13 @@ class QMenuRepository(private var jpaQueryFactory: JPAQueryFactory) {
             .fetch()
     }
 
+    fun searchWords(words: String): List<Menu> {
+        return jpaQueryFactory.selectFrom(QMenu.menu)
+            .where(QMenu.menu.thisIsOption.eq(false))
+            .where(QMenu.menu.menuName.contains(words))
+            .join(QMenu.menu.store)
+            .fetchJoin()
+            .fetch()
+    }
+
 }
