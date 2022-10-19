@@ -39,6 +39,6 @@ BackEnd(Language & Framework & Library)
 
 ### Tech Structure
 
-![아키텍처](../readmeImg/strcture.png)
+![아키텍처](https://raw.githubusercontent.com/Tbread/deliveryService/master/readmeImg/structure.png)
 
 
