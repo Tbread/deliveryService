@@ -1071,4 +1071,28 @@ class StoreControllerTest {
     여기부터  로직 관련
     */
 
+    @Test
+    @Transactional
+    @DisplayName("가게 찜목록 추가-성공")
+    @Throws(Exception::class)
+    fun addFavorStoreSuccess() {
+        var store = Store()
+        store.storeName = "testStoreName"
+        store.owner = userRepository.findByEmail("business@email.com")
+        storeRepository.save(store)
+        var id = store.id
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.patch("/store/manage-favor/$id")
+                .header("Authorization", defaultToken)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("성공적으로 등록하였습니다."))
+    }
+
 }
