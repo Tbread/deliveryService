@@ -54,6 +54,9 @@ class StoreControllerTest {
     @Autowired
     lateinit var menuOptionRepository: MenuOptionRepository
 
+    @Autowired
+    lateinit var favorStoreRepository: FavorStoreRepository
+
     var defaultToken = ""
     var businessToken = ""
     var adminToken = ""
@@ -1093,6 +1096,33 @@ class StoreControllerTest {
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
             .andExpect(MockMvcResultMatchers.jsonPath("msg").value("성공적으로 등록하였습니다."))
+    }
+
+
+    @Test
+    @Transactional
+    @DisplayName("가게 찜목록 제거-성공")
+    @Throws(Exception::class)
+    fun removeFavorStoreSuccess() {
+        var store = Store()
+        store.storeName = "testStoreName"
+        store.owner = userRepository.findByEmail("business@email.com")
+        storeRepository.save(store)
+        var id = store.id
+        var favorStore = FavorStore(userRepository.findByEmail("business@email.com")!!,store)
+        favorStoreRepository.save(favorStore)
+
+        //when
+        var resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.patch("/store/manage-favor/$id")
+                .header("Authorization", defaultToken)
+        ).andDo(MockMvcResultHandlers.print())
+
+        //then
+        resultActions
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("code").value(200))
+            .andExpect(MockMvcResultMatchers.jsonPath("msg").value("성공적으로 삭제하였습니다."))
     }
 
 }
